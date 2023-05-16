@@ -46,7 +46,7 @@ if(isset($_POST['con'])) {
             $Mdps = $_POST['Mdps'];
             if (Membre::password_decrypt($Mdps, $row[0]['Mdps'])) {
                 //Stocker les informations du membre dans la session--------------------------------------------------------------------//
-                foreach ($row as $indice => $element) {
+                foreach ($row[0] as $indice => $element) {
                     if ($indice != 'Mdps') {
                         $_SESSION['membre'][$indice] = $element;
                     }
