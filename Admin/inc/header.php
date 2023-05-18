@@ -1,7 +1,15 @@
-<?php session_start(); ?>
+<?php
+
+use Tets\Oop\Membre;
+
+session_start();
+if(!Membre::Admin()){
+    header("location:../index.php");
+}
+?>
 <!doctype html>
 <html lang="en">
-    
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
@@ -21,6 +29,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>  
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <script src="../inc/js/functions.js"></script>
     <title>Document</title>
 </head>

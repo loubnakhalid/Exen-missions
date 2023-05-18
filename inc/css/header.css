@@ -92,50 +92,8 @@ table td.action input {
     display: none;
 }
 
-.datepicker-dropdown {
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
-    margin-top: 102px;
-}
-
-.datepicker {
-    padding: 0;
-}
-
-.datepicker td,
-.datepicker th {
-    width: 2.5rem;
-    height: 2.5rem;
-    font-size: 0.85rem;
-}
-
-.datepicker-dropdown:after {
-    border-bottom-color: #08c;
-}
-
-.datepicker-days .table-condensed thead tr:nth-child(2),
-.datepicker-months .table-condensed thead tr:nth-child(2),
-.datepicker-years .table-condensed thead tr:nth-child(2),
-.datepicker-decades .table-condensed thead tr:nth-child(2),
-.datepicker-centuries .table-condensed thead tr:nth-child(2) {
-    background: linear-gradient(to bottom, #08c, #04c);
-    color: #fff;
-}
-
-.datepicker-days .table-condensed thead tr:nth-child(2) th:hover,
-.datepicker-months .table-condensed thead tr:nth-child(2) th:hover,
-.datepicker-years .table-condensed thead tr:nth-child(2) th:hover,
-.datepicker-decades .table-condensed thead tr:nth-child(2) th:hover,
-.datepicker-centuries .table-condensed thead tr:nth-child(2) th:hover {
-    background: linear-gradient(to bottom, #08c, #04c);
-    color: #fff;
-}
-
-.datepicker-days .table-condensed tfoot,
-.datepicker-months .table-condensed tfoot,
-.datepicker-years .table-condensed tfoot,
-.datepicker-decades .table-condensed tfoot,
-.datepicker-centuries .table-condensed tfoot {
-    border-top: solid 1px rgba(0, 0, 0, .15);
+.swal-modal {
+    width: 514px;
 }
 
 .infoMiss {

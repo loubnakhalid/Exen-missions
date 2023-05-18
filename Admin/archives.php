@@ -103,7 +103,7 @@ $row=$rslt->fetchAll();
                         <i class='fa-sharp fa-solid fa-rotate-left fa-2x' style='color: #1c9b1c;' onclick='document.location.href=\"../controller.php?restMiss&IdMiss=$row[IdMiss]&page=$page\"'></i>
                     </span>     
                     <span>
-                        <i class='fa-solid fa-trash fa-2x' style='color: red;' onclick='document.location.href=\"../controller.php?suppMiss&IdMiss=$row[IdMiss]&page=$page\"'></i>
+                        <i class='fa-solid fa-trash fa-2x' style='color: red;' onclick=\"confirmSupp('missions',$row[IdMiss],$page)\"></i>
                    </span>
                 </td>
             </tr>   
@@ -141,5 +141,13 @@ $row=$rslt->fetchAll();
     </ul>
 </div>
 <?php
+    if(isset($_SESSION['erreur'])){
+        echo "<script>erreur(\"$_SESSION[erreur]\");</script>";
+        unset($_SESSION['erreur']);
+    }
+    if(isset($_SESSION['success'])){
+        echo "<script>success('$_SESSION[success]');</script>";
+        unset($_SESSION['success']);
+    }
 include "./inc/footer.html";
 ?>

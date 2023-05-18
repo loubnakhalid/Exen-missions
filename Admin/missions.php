@@ -199,7 +199,7 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form id="ajtMiss" action="../controller.php" method="POST" onsubmit="return vérifAjtMiss();">
+                <form id="ajtMiss" action="../controller.php" method="POST" onsubmit="return vérifAjtMiss()">
                     <div class="modal-body">
                         <div class="row-collab">
                             <label>Collaborateur pour la mission :</label>
@@ -273,7 +273,7 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="infoMiss" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal fade" id="infoMiss" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true"> 
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content ">
                 <div class="modal-header">
@@ -288,7 +288,7 @@
                             <td>
                                 Collaborateur :
                             </td>
-                            <td id="Collab">
+                            <td id="infoCollab">
 
                             </td>
                         </tr>
@@ -296,7 +296,7 @@
                             <td>
                                 Objet mission :
                             </td>
-                            <td id="ObjMiss">
+                            <td id="infoObjMiss">
 
                             </td>
                         </tr>
@@ -304,7 +304,7 @@
                             <td>
                                 Type mission :
                             </td>
-                            <td id="TypeMission">
+                            <td id="infoTypeMiss">
 
                             </td>
                         </tr>
@@ -312,7 +312,7 @@
                             <td>
                                 Date départ :
                             </td>
-                            <td id="Départ">
+                            <td id="infoDépart">
 
                             </td>
                         </tr>
@@ -320,7 +320,7 @@
                             <td>
                                 Date retour :
                             </td>
-                            <td id="DateRetour">
+                            <td id="infoRetour">
 
                             </td>
                         </tr>
@@ -328,7 +328,7 @@
                             <td>
                                 Lieu déplacement :
                             </td>
-                            <td id="LieuDép">
+                            <td id="infoLieuDép">
 
                             </td>
                         </tr>
@@ -336,7 +336,7 @@
                             <td>
                                 Moyen de tansport :
                             </td>
-                            <td id="MoyTrans">
+                            <td id="infoMoyTrans">
 
                             </td>
                         </tr>
@@ -344,7 +344,7 @@
                             <td>
                                 Durée :
                             </td>
-                            <td id="Durée">
+                            <td id="infoDurée">
 
                             </td>
                         </tr>
@@ -362,7 +362,7 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form id="modifMiss" action="../controller.php?page=<?=$page?>" method="POST" onsubmit='return vérifModifMiss();'>
+                <form id="modifMiss" action="../controller.php?page=<?=$page?>" method="POST" onsubmit="return vérifModifMiss()">
                     <input type="hidden" name="IdMiss" id="IdMiss">
                     <div class="modal-body">
                         <div class="row g-3 mb-3">
@@ -409,9 +409,7 @@
                             <div class="col-xl col-lg">
                                 <label>Type mission</label>
                                 <select type="text" name="TypeMiss" id="TypeMissModif" class="form-select">
-                                    <option value="">Choisir</option>
-                                    <option value="j">Journaliere</option>
-                                    <option value="m">Mensuel</option>
+
                                 </select>
                             </div>
                         </div>
@@ -484,5 +482,13 @@
     </div>
 
 <?php
+    if(isset($_SESSION['erreur'])){
+        echo "<script>erreur(\"$_SESSION[erreur]\");</script>";
+        unset($_SESSION['erreur']);
+    }
+    if(isset($_SESSION['success'])){
+        echo "<script>success('$_SESSION[success]');</script>";
+        unset($_SESSION['success']);
+    }
     include "./inc/footer.html";
 ?>

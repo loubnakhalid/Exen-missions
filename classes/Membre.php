@@ -1,6 +1,5 @@
 <?php
 namespace Tets\Oop;
-session_start();
 
 class Membre
 {

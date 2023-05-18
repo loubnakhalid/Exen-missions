@@ -56,6 +56,12 @@ $(document).ready(function() {
                 $('#MoyTransModif').val(response.MoyTrans);
                 $('#NoteModif').text(response.Note);
                 $('#AccompModif').val(response.Accomp);
+                if (response.TypeMiss == "Journaliere") {
+                    var options = "<option value='Journaliere' selected>Journaliere</option><option value='Mensuel'>Mensuel</option>"
+                } else {
+                    var options = "<option value='Journaliere'>Journaliere</option><option value='Mensuel' selected>Mensuel</option>"
+                }
+                $('#TypeMissModif').html(options);
             },
             error: function() {
                 alert('Une erreur s\'est produite lors de la récupération des informations de la mission.');
@@ -73,14 +79,14 @@ $(document).ready(function() {
             dataType: 'json',
             success: function(response) {
                 $('#infoMissTitle').text("Détails mission : " + response.RéfMiss);
-                $('#Collab').text(response.Collab);
-                $('#ObjMiss').text(response.ObjMiss);
-                $('#TypeMission').text(response.TypeMiss);
-                $('#Départ').text(response.Départ);
-                $('#DateRetour').text(response.Retour);
-                $('#LieuDép').text(response.LieuDép);
-                $('#MoyTrans').text(response.MoyTrans);
-                $('#Durée').html(response.Durée + '<b> Jours</b>');
+                $('#infoCollab').text(response.Collab);
+                $('#infoObjMiss').text(response.ObjMiss);
+                $('#infoTypeMiss').text(response.TypeMiss);
+                $('#infoDépart').text(response.Départ);
+                $('#infoRetour').text(response.Retour);
+                $('#infoLieuDép').text(response.LieuDép);
+                $('#infoMoyTrans').text(response.MoyTrans);
+                $('#infoDurée').html(response.Durée + '<b> Jours</b>');
                 if (response.Montant !== null) {
                     $('#tableInfoMiss').append('<tr><td>Montant :</td><td id="Montant">' + response.Montant + '<b> DHS</b></td></tr>');
                 }
@@ -104,7 +110,7 @@ $(document).ready(function() {
                 $('#PrénomCollab').text(response.Prénom);
                 $('#EmailCollab').text(response.Email);
                 $('#CINCollab').text(response.CIN);
-                $('#ProfileCollab').text(response.Profile);
+                $('#ProfileCollab').text(response.Profil);
                 $('#nbrMiss').text(response.nbrMiss);
             },
             error: function() {
@@ -150,19 +156,14 @@ $(document).ready(function() {
                 $('#NomModif').val(response.Nom);
                 $('#PrénomModif').val(response.Prénom);
                 $('#EmailModif').val(response.Email);
-                $('#ProfileModif').val(response.Profile);
+                $('#ProfileModif').val(response.Profil);
                 $('#CINModif').val(response.CIN);
-                var selectElement = $('#IdG');
-                selectElement.empty(); // Efface toutes les options existantes
-                $.each(response, function(index, row) {
-                    var option = $('<option></option>')
-                        .attr('value', row.IdG)
-                        .text(row.Libellé);
-                    if (row.IdG == response.IdG) {
-                        option.attr('selected', 'selected');
-                    }
-                    selectElement.append(option);
-                });
+                selectElement = $('#IdG');
+                // Récupérer la valeur de IdG de la réponse
+                var selectedIdG = response.IdG;
+
+                // Sélectionner l'option correspondante dans le sélecteur #IdG
+                selectElement.val(selectedIdG);
             },
             error: function() {
                 alert('Une erreur s\'est produite lors de la récupération des informations de la mission.');
@@ -170,6 +171,7 @@ $(document).ready(function() {
         });
     });
 });
+
 $(function() {
     $("#Départ").datepicker({
         altField: "#datepicker",

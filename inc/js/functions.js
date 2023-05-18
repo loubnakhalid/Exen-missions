@@ -302,3 +302,51 @@ function removeFile(index) {
     var element = document.getElementById('fileRow-' + index);
     element.remove();
 }
+
+function confirmSupp(table, id, page) {
+    switch (table) {
+        case "missions":
+            vText = "Voulez-vous vraiment supprimer cette mission définitivement ?";
+            url = "../controller.php?suppMiss&page=" + page + "&IdMiss=" + id;
+            break;
+        case "membres":
+            vText = "Voulez-vous vraiment supprimer ce collaborateur définitivement ?";
+            url = "../controller.php?suppCollab&page=" + page + "&IdMb=" + id;
+            break;
+    }
+    swal({
+            title: "",
+            text: vText,
+            icon: "warning",
+            buttons: [
+                "Annuler",
+                "Supprimer",
+            ],
+            dangerMode: true,
+        })
+        .then((willDelete) => {
+            if (willDelete) {
+                document.location.href = url;
+            }
+        });
+}
+
+function success(success) {
+    swal({
+        title: '',
+        text: success,
+        icon: 'success',
+        button: false,
+        timer: 3000,
+    });
+}
+
+function erreur(erreur) {
+    swal({
+        title: '',
+        text: erreur,
+        icon: 'warning',
+        button: false,
+        timer: 3000,
+    });
+}

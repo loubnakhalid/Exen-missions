@@ -1,10 +1,15 @@
 <?php
-
-use Tets\Oop\Membre;
+use \Tets\Oop\Membre;
 
 session_start();
+
 include "vendor/autoload.php";
+
+if(!Membre::Admin()){
+    header("location:../index.php");
+}
 require('./fpdf/fpdf.php');
+
 function mois($mois){
     switch($mois){
         case '01' : return 'Janvier';
@@ -33,6 +38,7 @@ function mois($mois){
             break;
     }
 }
+
 if(isset($_POST['con'])) {
     $Email=strtolower(trim($_POST['Email']));
     setcookie('Email', $Email, time() + 600);
@@ -80,8 +86,9 @@ elseif(isset($_POST['ajtCollab'])){
             "Email" => $_POST['Email'],
             "Mdps" => password_hash($_POST['Mdps'],PASSWORD_DEFAULT,['cost'=>14]),
             "CIN" => $_POST['CIN'],
-            "Profile" => $_POST['Profile'],
+            "Profil" => $_POST['Profil'],
         ))){
+            $_SESSION['success']="Collaborateur ajouté avec succés ! ";
             header("location:./admin/collabs.php");
         }
         else{
@@ -105,14 +112,15 @@ elseif(isset($_POST['modifCollab'])){
         if(!$row1){
             if(isset($_POST['Mdps'])){
                 if(\Tets\Oop\DataBase::updateData('membres',array(
-                    "Statut" => 0,
                     "Nom" => $_POST['Nom'],
                     "Prénom" => $_POST['Prénom'],
+                    "IdG" => $_POST['Grp'],
                     "Email" => $_POST['Email'],
                     "Mdps" => \Tets\Oop\Membre::password_encrypt($_POST['Mdps']),
                     "CIN" => $_POST['CIN'],
-                    "Profile" => $_POST['Profile'],
+                    "Profil" => $_POST['Profil'],
                 ),"IdMb=$_POST[IdMb]")){
+                    $_SESSION['success']="Collaborateur modifié avec succés ! ";
                     header("location:./admin/collabs.php");
                 }
                 else{
@@ -121,12 +129,12 @@ elseif(isset($_POST['modifCollab'])){
             }
             else{
                 if(\Tets\Oop\DataBase::updateData('membres',array(
-                    "Statut" => 0,
                     "Nom" => $_POST['Nom'],
                     "Prénom" => $_POST['Prénom'],
+                    "IdG" => $_POST['Grp'],
                     "Email" => $_POST['Email'],
                     "CIN" => $_POST['CIN'],
-                    "Profile" => $_POST['Profile'],
+                    "Profil" => $_POST['Profil'],
                 ),"IdMb=$_POST[IdMb]")){
                     header("location:./admin/collabs.php");
                 }
@@ -147,7 +155,8 @@ elseif(isset($_POST['modifCollab'])){
 }
 elseif(isset($_GET['suppCollab']) && isset($_GET['IdMb'])){
     \Tets\Oop\DataBase::deleteData('membres',"IdMb=$_GET[IdMb]");
-    header("location:./admin/collabs.php");
+    $_SESSION['success']="Collaborateur supprimé avec succés ! ";
+    header("location:./admin/collabs.php?page=$_GET[page]");
 }
 elseif(isset($_POST['ajtMiss'])){
     $Départ = new DateTime("$_POST[Départ]"); // date de début
@@ -172,6 +181,7 @@ elseif(isset($_POST['ajtMiss'])){
             $Départ->modify('+1 day');
         }
     }
+    date_default_timezone_set('Africa/Casablanca');
     $DateMiss=date("d/m/20y H:i:s");
     $rslt=\Tets\Oop\DataBase::insertData('missions',array(
         "RéfMiss" => \Tets\Oop\Missions::generate_ref(),
@@ -188,21 +198,40 @@ elseif(isset($_POST['ajtMiss'])){
         "Note" => $_POST['Note'],
         "StatutMiss" => "0",
     ));
-    $con=\Tets\Oop\DataBase::connect();
-    $count=$con->query("select count(IdMiss) as cpt from missions");
-    $tcount=$count->fetchAll();
-    $nbr_elements_par_page=6;
-    $nbr_de_pages=ceil($tcount[0]["cpt"]/$nbr_elements_par_page);
+
     if($rslt){
-        header("location:./admin/missions.php?page=$nbr_de_pages");
+        $_SESSION['success']="Mission ajoutée avec succés ! ";
+        header("location:./admin/missions.php");
     }
     else{
-        header("location:./admin/missions.php?page=$nbr_de_pages");
+        header("location:./admin/missions.php");
     }
     exit;
 }
 elseif (isset($_POST['modifMiss'])){
     $IdMiss=$_POST["IdMiss"];
+    $Départ = new DateTime("$_POST[Départ]"); // date de début
+    $Retour = new DateTime("$_POST[Retour]"); // date de fin
+    if($_POST["TypeMiss"]=='Journalier'){
+        $nbJours = 0;
+        while ($Départ <= $Retour) {
+            // on vérifie si la date courante est un samedi ou un dimanche
+            if ($Départ->format('N') < 6) {
+                $nbJours++;
+            }
+            // on incrémente la date de 1 jour
+            $Départ->modify('+1 day');
+        }
+    }
+    else{
+        $nbJours = 0;
+        while ($Départ <= $Retour) {
+            // on vérifie si la date courante est un samedi ou un dimanche
+            $nbJours++;
+            // on incrémente la date de 1 jour
+            $Départ->modify('+1 day');
+        }
+    }
     \Tets\Oop\DataBase::updateData('missions',array(
         "IdMb" => $_POST['IdMb'],
         "Accomp" => $_POST['Accomp'],
@@ -211,9 +240,11 @@ elseif (isset($_POST['modifMiss'])){
         "MoyTrans" => $_POST['MoyTrans'],
         "Départ" => $_POST['Départ'],
         "Retour" => $_POST['Retour'],
+        "Durée" => $nbJours,
         "TypeMiss" => $_POST['TypeMiss'],
         "Note" => $_POST['Note'],
     ),"IdMiss=$IdMiss");
+    $_SESSION['success']="Mission modifiée avec succés ! ";
     header("location:./admin/missions.php?page=$_GET[page]");
 }
 elseif(isset($_GET['validerMiss'])){
@@ -261,6 +292,7 @@ elseif(isset($_GET['validerMiss'])){
         "StatutMiss" => 1,
         "OrdreMiss" => "Ordre_Mission_$IdMiss.pdf",
     ),"IdMiss=$IdMiss");
+    $_SESSION['success']="Mission validée avec succés ! ";
     header("location:./admin/missions.php?page=$_GET[page]");
 }
 elseif(isset($_POST['validerRemb']) ){
@@ -351,7 +383,7 @@ elseif(isset($_POST['validerRemb']) ){
         $pdf->SetX('10');
         $pdf->MultiCell(200,9,iconv("UTF-8", "CP1250//TRANSLIT", "Je soussiné Mr. $row[Nom] $row[Prénom] titulaire de la CIN n° $row[CIN] reconnais avoir reçu de la société exen consulting sarl la somme de $Remb DH ".ucfirst($lettre->Conversion($Remb))." Dirhams par $row[TypePaiement] au titre des remboursements de frais de mon deplacement à $row[LieuDép] durant le mois de $mois $année"),0,1,0,false);
     $pdf->Output('F',"PDF/Demande_Remboursement/Demande_Remboursement_$IdMiss.pdf",true);
-
+    $_SESSION['success']="Remboursement validé avec succés ! ";
     header("location:./admin/missions.php");
 }
 elseif(isset($_GET['archMiss']) && isset($_GET['IdMiss'])){
@@ -359,18 +391,18 @@ elseif(isset($_GET['archMiss']) && isset($_GET['IdMiss'])){
     \Tets\Oop\DataBase::updateData('missions',array(
         "DeletedAt" => $Date,
     ),"IdMiss=$_GET[IdMiss]");
+    $_SESSION['success']="Mission archivée avec succés ! ";
     header("location:./admin/missions.php?page=$_GET[page]");
 }
 elseif(isset($_GET['restMiss']) && isset($_GET['IdMiss'])){
     $con=\Tets\Oop\DataBase::connect();
     $rslt=$con->query("update missions set DeletedAt=DEFAULT where IdMiss=$_GET[IdMiss]");
-    /*\Tets\Oop\DataBase::updateData('missions',array(
-        "DeletedAt" => "DEFAULT",
-    ),"IdMiss=$_GET[IdMiss]");*/
+    $_SESSION['success']="Mission restaurée avec succés ! ";
     header("location:./admin/archives.php?page=$_GET[page]");
 }
 elseif(isset($_GET['suppMiss']) && isset($_GET['IdMiss'])){
     \Tets\Oop\DataBase::deleteData('missions',"IdMiss=$_GET[IdMiss]");
+    $_SESSION['success']="Mission supprimée avec succés ! ";
     header("location:./admin/archives.php?page=$_GET[page]");
 }
 elseif(isset($_POST['IdMb']) && isset($_POST['getCollab'])){
@@ -386,7 +418,7 @@ elseif(isset($_POST['IdMb']) && isset($_POST['getCollab'])){
         'IdG' => $row['IdG'],
         'Email' => $row['Email'],
         'CIN' => $row['CIN'],
-        'Profile' => $row['Profile'],
+        'Profil' => $row['Profil'],
         'nbrMiss' => $nbrMiss,
     );
     echo json_encode($infoCollab);
@@ -411,6 +443,20 @@ elseif(isset($_POST['IdMiss']) && isset($_POST['getMiss'])){
         'Accomp' => $row['Accomp'],
     );
     echo json_encode($infoMiss);
+}
+elseif (isset($_POST['getGroupes'])) {
+    $con = \Tets\Oop\DataBase::connect();
+    $rslt = $con->query("SELECT * FROM groupes");
+    $groupes = array();
+
+    while ($row = $rslt->fetch()) {
+        $groupes[] = array(
+            'IdG' => $row['IdG'],
+            'Libellé' => $row['Libellé']
+        );
+    }
+
+    echo json_encode($groupes);
 }
 elseif(isset($_GET['getFrais'])){
     $con=\Tets\Oop\DataBase::connect();

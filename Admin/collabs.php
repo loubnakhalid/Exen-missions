@@ -1,36 +1,35 @@
 <?php
+    use Tets\Oop\DataBase;
 
-use Tets\Oop\DataBase;
-
-require "../vendor/autoload.php";
-include "./inc/header.php";
-$con=\Tets\Oop\DataBase::connect();
-//Nbre d'enregistrement
-if(isset($_GET['search'])){
-    $count=$con->query("select count(IdMb) as cpt from membres where  (Nom like '%$_GET[search]%' or Prénom like '%$_GET[search]%' or CIN like '%$_GET[search]%' or Email like '%$_GET[search]%' or Profile like '%$_GET[search]%') ");
-}
-else{
-    $count=$con->query("select count(IdMb) as cpt from membres");
-}
-$tcount=$count->fetchAll();
-//pagination
-if(isset($_GET["page"])){
-    @$page=$_GET["page"];
-}
-else{
-    @$page=1;
-}
-$nbr_elements_par_page=6;
-$nbr_de_pages=ceil($tcount[0]["cpt"]/$nbr_elements_par_page);
-$debut=($page-1)*$nbr_elements_par_page;
-//les enregistrements
-if(isset($_GET['search'])){
-    $rslt=$con->query("select * from membres natural join groupes where (Nom like '%$_GET[search]%' or Prénom like '%$_GET[search]%' or CIN like '%$_GET[search]%' or Email like '%$_GET[search]%' or Profile like '%$_GET[search]%')  limit $debut,$nbr_elements_par_page");
-}
-else{
-    $rslt=$con->query("select * from membres natural join groupes limit $debut,$nbr_elements_par_page");
-}
-$row=$rslt->fetchAll();
+    require "../vendor/autoload.php";
+    include "./inc/header.php";
+    $con=\Tets\Oop\DataBase::connect();
+    //Nbre d'enregistrement
+    if(isset($_GET['search'])){
+        $count=$con->query("select count(IdMb) as cpt from membres where Statut=0 and  (Nom like '%$_GET[search]%' or Prénom like '%$_GET[search]%' or CIN like '%$_GET[search]%' or Email like '%$_GET[search]%' or Profile like '%$_GET[search]%') ");
+    }
+    else{
+        $count=$con->query("select count(IdMb) as cpt from membres where Statut=0");
+    }
+    $tcount=$count->fetchAll();
+    //pagination
+    if(isset($_GET["page"])){
+        @$page=$_GET["page"];
+    }
+    else{
+        @$page=1;
+    }
+    $nbr_elements_par_page=6;
+    $nbr_de_pages=ceil($tcount[0]["cpt"]/$nbr_elements_par_page);
+    $debut=($page-1)*$nbr_elements_par_page;
+    //les enregistrements
+    if(isset($_GET['search'])){
+        $rslt=$con->query("select * from membres natural join groupes where Statut=0 and (Nom like '%$_GET[search]%' or Prénom like '%$_GET[search]%' or CIN like '%$_GET[search]%' or Email like '%$_GET[search]%' or Profile like '%$_GET[search]%')  limit $debut,$nbr_elements_par_page");
+    }
+    else{
+        $rslt=$con->query("select * from membres natural join groupes where Statut=0 limit $debut,$nbr_elements_par_page");
+    }
+    $row=$rslt->fetchAll();
 ?>
 <div class="entete">
     <h1>Liste des collaborateurs</h1>
@@ -62,7 +61,7 @@ $row=$rslt->fetchAll();
             <th>Groupe</th>
             <th>Email</th>
             <th>CIN</th>
-            <th>Profile</th>
+            <th>Profil</th>
             <th>Missions</th>
             <th style="width:129px">Actions</th>
         </tr>
@@ -87,7 +86,7 @@ $row=$rslt->fetchAll();
                 <td>$row[Libellé]</td>
                 <td>$row[Email]</td>
                 <td>$row[CIN]</td>
-                <td>$row[Profile]</td>
+                <td>$row[Profil]</td>
                 <td>$style</td>
                 <td class='action'>
                     <span>
@@ -97,7 +96,7 @@ $row=$rslt->fetchAll();
                         <i class='bx bx-edit icnModifCollab'  data-toggle='modal' data-target='#modifCollab' data-id='$row[IdMb]' style='color: orange;margin-top: 4px;font-size: 25px;'></i>
                     </span>
                     <span>
-                        <i class='fa-solid fa-trash fa-2x' style='color: #e82626;font-size: 24px !important' onclick=\"document.location.href='../controller.php?suppCollab&IdMb=$row[IdMb]'\"></i>
+                        <i class='fa-solid fa-trash fa-2x' style='color: #e82626;font-size: 24px !important' onclick=\"confirmSupp('membres',$row[IdMb],$page)\"></i>
                     </span>
                 </td>
             </tr>   
@@ -144,7 +143,7 @@ $row=$rslt->fetchAll();
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-        <form action="../controller.php" method="post" onsubmit="return vérifAjtCollab()">
+        <form action="../controller.php" id="formAjtCollab" method="post" onsubmit="vérifAjtCollab()">
             <div class="modal-body p-4">
                 <div class="row g-3 mb-3">
                     <div class="col-xl xol-lg">
@@ -194,15 +193,15 @@ $row=$rslt->fetchAll();
                         <div class="invalid-feedback" id="errCINAjt" style="display: none;"></div>
                     </div>
                     <div class="col-xl col-lg">
-                        <label for="" class="form-label">Profile :</label>
-                        <input type="text" name="Profile" id="ProfileAjt" placeholder="Profile" class="form-control">
+                        <label for="" class="form-label">Profil :</label>
+                        <input type="text" name="Profil" id="ProfileAjt" placeholder="Profil" class="form-control">
                         <div class="invalid-feedback" id="errProfileAjt" style="display: none;"></div>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal" style="width: 72px;height: 36px;">Fermer</button>
-                <button type="submit" name="ajtCollab" class="btn btn-primary" style="width: 145px;background-color: #69c1ec !important;border-color: #69c1ec !important;height: 36px;">Ajouter</button>
+                <button type="submit" name="ajtCollab" value="Ajouter" class="btn btn-primary" style="width: 145px;background-color: #69c1ec !important;border-color: #69c1ec !important;height: 36px;">Ajouter</button>
             </div>
         </form>
         </div>
@@ -218,7 +217,7 @@ $row=$rslt->fetchAll();
                 </button>
             </div>
             <div class="modal-body p-4">
-            <form action="../controller.php" method="post" onsubmit="return vérifModifCollab()">
+            <form action="../controller.php" id="formModifCollac" method="post" onsubmit="return vérifModifCollab()">
                 <input type="hidden" name="IdMb" id="IdMb" value="">
                 <div class="row g-3 mb-3">
                     <div class="col-xl xol-lg">
@@ -262,8 +261,8 @@ $row=$rslt->fetchAll();
                         <div class="invalid-feedback" id="errCINModif" style="display: none;"></div>
                     </div>
                     <div class="col-xl col-lg">
-                        <label for="" class="form-label">Profile :</label>
-                        <input type="text" name="Profile" id="ProfileModif" placeholder="Profile" class="form-control">
+                        <label for="" class="form-label">Profil :</label>
+                        <input type="text" name="Profil" id="ProfileModif" placeholder="Profil" class="form-control">
                         <div class="invalid-feedback" id="errProfileModif" style="display: none;"></div>
                     </div>
                 </div>
@@ -383,5 +382,13 @@ if(isset($_SESSION['erreurEmail']) || isset($_SESSION['erreurCIN'])){
 }
 ?>
 <?php
-include "./inc/footer.html";
+    if(isset($_SESSION['erreur'])){
+        echo "<script>erreur(\"$_SESSION[erreur]\");</script>";
+        unset($_SESSION['erreur']);
+    }
+    if(isset($_SESSION['success'])){
+        echo "<script>success('$_SESSION[success]');</script>";
+        unset($_SESSION['success']);
+    }
+    include "./inc/footer.html";
 ?>
