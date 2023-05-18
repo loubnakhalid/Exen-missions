@@ -35,6 +35,7 @@
     }
     $row=$rslt->fetchAll();
 ?>
+
     <div class="entete">
         <h1>Liste des missions</h1>
         <div class="search-add">
@@ -124,22 +125,27 @@
                     ";
                 }
                 else{
-                    echo "
+                    if($row['StatutMiss']==0){
+                        echo "
+                        <span class='dropdown'>
+                            <button class='btn btn-secondary dropdown-toggle blue' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
+                                <i class='fa-sharp fa-regular fa-circle-check'></i>
+                            </button>
+                            <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
+                                <input type='hidden' value='$row[TypeMiss]' id='TypeMiss'>
+                                <a class='dropdown-item' href='../controller.php?validerMiss&IdMiss=$row[IdMiss]&page=$page'>Valider la mission</a>
+                                <a class='dropdown-item disabled' href='javascript:void(0)'  data-id='$row[IdMiss]'  data-toggle='modal' data-target='#validerRemb'>Valider le remboursement</a>
+                        ";
+                    }
+                    else{
+                        echo "  
                         <span class='dropdown'>
                             <button class='btn btn-secondary dropdown-toggle green' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
                                 <i class='fa-sharp fa-regular fa-circle-check'></i>
                             </button>
                             <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
                                 <input type='hidden' value='$row[TypeMiss]' id='TypeMiss'>
-                    ";
-                    if($row['StatutMiss']==0){
-                        echo "
-                                <a class='dropdown-item' href='../controller.php?validerMiss&IdMiss=$row[IdMiss]&page=$page'>Valider la mission</a>
-                                <a class='dropdown-item disabled' href='javascript:void(0)'  data-id='$row[IdMiss]'  data-toggle='modal' data-target='#validerRemb'>Valider le remboursement</a>
-                        ";
-                    }
-                    else{
-                        echo "  <a class='dropdown-item disabled' href='javascript:void(0)'>Valider la mission</a>
+                                <a class='dropdown-item disabled' href='javascript:void(0)'>Valider la mission</a>
                             ";
                         if($row['Montant']==NULL){
                             echo "<a class='dropdown-item' id='lienValiderRemb' href='../controller.php?validerRemb&IdMiss=$row[IdMiss]&page=$page' data-TypeMiss='$row[TypeMiss]' data-id='$row[IdMiss]' data-toggle='modal' data-target='#validerRemb'>Valider le remboursement</a>";
@@ -162,6 +168,7 @@
             </tbody>
         </table>
     </div>  
+
     <div>
         <ul class="pagination">
             <li class="page-item <?php if($page==1)echo 'disabled'; ?>">
@@ -273,6 +280,7 @@
             </div>
         </div>
     </div>
+
     <div class="modal fade" id="infoMiss" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true"> 
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content ">
@@ -353,6 +361,7 @@
             </div>
         </div>
     </div>
+
     <div class="modal fade" id="formModif" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
@@ -428,6 +437,7 @@
             </div>
         </div>
     </div>
+
     <div class="modal fade" id="validerRemb" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered " role="document">
             <div class="modal-content">

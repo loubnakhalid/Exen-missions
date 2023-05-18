@@ -122,3 +122,11 @@ table td.action input {
 .tableCollabMiss td {
     width: 10px;
 }
+
+.green {
+    background-color: #1c9b1c !important;
+}
+
+.blue {
+    background-color: #58baea !important;
+}

@@ -1,4 +1,5 @@
 <?php
+
 use \Tets\Oop\Membre;
 
 session_start();
@@ -8,6 +9,7 @@ include "vendor/autoload.php";
 if(!Membre::Admin()){
     header("location:../index.php");
 }
+
 require('./fpdf/fpdf.php');
 
 function mois($mois){
@@ -299,7 +301,6 @@ elseif(isset($_POST['validerRemb']) ){
     $IdMiss=$_POST['IdMiss'];
     $Remb=$_POST['Remb'];
     $Date=Date("d-m-20y");
-
     if(isset($_POST['nomFile'])){
         $file=$_FILES['file'];
         $Description=$_POST['nomFile'];
@@ -320,21 +321,23 @@ elseif(isset($_POST['validerRemb']) ){
             move_uploaded_file($tmp_name,"./PJ/$filename");
         }
     }
-
-    $Remb += $Remb *($row['TauxG']/100);
+    $con=\Tets\Oop\DataBase::connect();
+    $rslt=$con->query("select * from missions natural join membres where IdMiss=$IdMiss");
+    $row=$rslt->fetch();
+    $IdMb=$row['IdMb'];
+    $rslt2=$con->query("select * from membres natural join groupes where IdMb=$IdMb");
+    $row2=$rslt2->fetch();
+    $DateFormat=explode("-",$row['Départ']);
+    $mois=mois($DateFormat[1]);
+    $année=$DateFormat[2];
+    $Remb += $Remb *($row2['TauxG']/100);
     \Tets\Oop\DataBase::updateData('missions',array(
         "Montant" => $Remb,
         "IdPaiement" => $_POST['Paiement'],
         "DemandeRemb" => "Demande_Remboursement_$IdMiss.pdf",
     ),"IdMiss=$IdMiss");
-
-    $con=\Tets\Oop\DataBase::connect();
-    $rslt=$con->query("select * from missions natural join membres natural join groupes natural join paiement where IdMiss=$IdMiss");
-    $row=$rslt->fetch();
-    $DateFormat=explode("-",$row['Départ']);
-    $mois=mois($DateFormat[1]);
-    $année=$DateFormat[2];
-
+    $rslt3=$con->query("select * from missions natural join paiement where IdMiss=$IdMiss");
+    $row3=$rslt3->fetch();
     $lettre=new \Tets\Oop\ChiffreEnLettre();
         $pdf = new PDF('P','mm','A4');
         $pdf->AddPage();
@@ -381,7 +384,7 @@ elseif(isset($_POST['validerRemb']) ){
         $pdf->SetFont('Helvetica','',12);
         $pdf->Ln('30');
         $pdf->SetX('10');
-        $pdf->MultiCell(200,9,iconv("UTF-8", "CP1250//TRANSLIT", "Je soussiné Mr. $row[Nom] $row[Prénom] titulaire de la CIN n° $row[CIN] reconnais avoir reçu de la société exen consulting sarl la somme de $Remb DH ".ucfirst($lettre->Conversion($Remb))." Dirhams par $row[TypePaiement] au titre des remboursements de frais de mon deplacement à $row[LieuDép] durant le mois de $mois $année"),0,1,0,false);
+        $pdf->MultiCell(200,9,iconv("UTF-8", "CP1250//TRANSLIT", "Je soussiné Mr. $row[Nom] $row[Prénom] titulaire de la CIN n° $row[CIN] reconnais avoir reçu de la société exen consulting sarl la somme de $Remb DH ".ucfirst($lettre->Conversion($Remb))." Dirhams par $row3[TypePaiement] au titre des remboursements de frais de mon deplacement à $row[LieuDép] durant le mois de $mois $année"),0,1,0,false);
     $pdf->Output('F',"PDF/Demande_Remboursement/Demande_Remboursement_$IdMiss.pdf",true);
     $_SESSION['success']="Remboursement validé avec succés ! ";
     header("location:./admin/missions.php");
