@@ -1,26 +1,3 @@
-function vérifAjtMiss() {
-    var collab = document.getElementById('collaborateur');
-    var ObjMiss = document.getElementById('ObjMiss');
-    var LieuDép = document.getElementById('LieuDép');
-    var Départ = document.getElementById('Départ');
-    var Retour = document.getElementById('Retour');
-    var TypeMiss = document.getElementById('TypeMission');
-    var array = [collab, ObjMiss, LieuDép, Départ, Retour, TypeMiss];
-    var aide = true;
-    for (let input of array) {
-        if (input.classList.contains('is-invalid')) {
-            input.classList.remove('is-invalid');
-        }
-    }
-    for (let input of array) {
-        if (input.value == '') {
-            aide = false;
-            input.classList += " is-invalid";
-        }
-    }
-    return aide;
-}
-
 function vérifLog() {
     var Email = document.getElementById("EmailLog");
     var Mdps = document.getElementById("MdpsLog");
@@ -59,6 +36,28 @@ function vérifLog() {
     return aide;
 }
 
+function vérifAjtMiss() {
+    var collab = document.getElementById('collaborateur');
+    var ObjMiss = document.getElementById('ObjMiss');
+    var LieuDép = document.getElementById('LieuDép');
+    var Départ = document.getElementById('Départ');
+    var Retour = document.getElementById('Retour');
+    var TypeMiss = document.getElementById('TypeMission');
+    var array = [collab, ObjMiss, LieuDép, Départ, Retour, TypeMiss];
+    var aide = true;
+    for (let input of array) {
+        if (input.classList.contains('is-invalid')) {
+            input.classList.remove('is-invalid');
+        }
+    }
+    for (let input of array) {
+        if (input.value == '') {
+            aide = false;
+            input.classList += " is-invalid";
+        }
+    }
+    return aide;
+}
 
 function vérifModifMiss() {
     var collab = document.getElementById('collaborateurModif');
@@ -176,6 +175,114 @@ function vérifModifCollab() {
     return aide;
 }
 
+function vérifModifGroupe() {
+    var Libellé = document.getElementById('LibelléModif');
+    var Taux = document.getElementById('TauxModif');
+    var array = [Libellé, Taux];
+    var aide = true;
+    for (let input of array) {
+        if (input.classList.contains('is-invalid')) {
+            input.classList.remove('is-invalid');
+        }
+    }
+    for (let input of array) {
+        document.getElementById("err" + input.id).innerHTML = "";
+    }
+    for (let input of array) {
+        if (input.value == '') {
+            aide = false;
+            input.classList += " is-invalid";
+            var err = document.getElementById("err" + input.id);
+            if (err) {
+                err.innerHTML = "Champ requis";
+                err.style.display = "block";
+            }
+        }
+    }
+    return aide;
+}
+
+function vérifAjtFrais() {
+    var Libellé = document.getElementById('LibelléFraisAjt');
+    var Montant = document.getElementById('MontantFraisAjt');
+    var array = [Libellé, Montant];
+    var aide = true;
+    for (let input of array) {
+        if (input.classList.contains('is-invalid')) {
+            input.classList.remove('is-invalid');
+        }
+    }
+    for (let input of array) {
+        document.getElementById("err" + input.id).innerHTML = "";
+    }
+    for (let input of array) {
+        if (input.value == '') {
+            aide = false;
+            input.classList += " is-invalid";
+            var err = document.getElementById("err" + input.id);
+            if (err) {
+                err.innerHTML = "Champ requis";
+                err.style.display = "block";
+            }
+        }
+    }
+    return aide;
+}
+
+function vérifModifFrais() {
+    var Libellé = document.getElementById('LibelléFraisModif');
+    var Montant = document.getElementById('MontantFraisModif');
+    var array = [Libellé, Montant];
+    var aide = true;
+    for (let input of array) {
+        if (input.classList.contains('is-invalid')) {
+            input.classList.remove('is-invalid');
+        }
+    }
+    for (let input of array) {
+        document.getElementById("err" + input.id).innerHTML = "";
+    }
+    for (let input of array) {
+        if (input.value == '') {
+            aide = false;
+            input.classList += " is-invalid";
+            var err = document.getElementById("err" + input.id);
+            if (err) {
+                err.innerHTML = "Champ requis";
+                err.style.display = "block";
+            }
+        }
+    }
+    return aide;
+}
+
+function vérifAjtGroupe() {
+    var Libellé = document.getElementById('LibelléAjt');
+    var Taux = document.getElementById('TauxAjt');
+    var array = [Libellé, Taux];
+    var aide = true;
+    for (let input of array) {
+        if (input.classList.contains('is-invalid')) {
+            input.classList.remove('is-invalid');
+        }
+    }
+    for (let input of array) {
+        document.getElementById("err" + input.id).innerHTML = "";
+    }
+    for (let input of array) {
+        if (input.value == '') {
+            aide = false;
+            input.classList += " is-invalid";
+            var err = document.getElementById("err" + input.id);
+            if (err) {
+                err.innerHTML = "Champ requis";
+                err.style.display = "block";
+            }
+        }
+    }
+    return aide;
+}
+
 function vérifRemb() {
     var Montant = document.getElementById("Montant");
     var Paiement = document.getElementById("Paiement");
@@ -286,7 +393,7 @@ function getOptionsHTML(options) {
     var optionsHTML = "<option value=\"null\"  data-taux='0'>Type de pièce</option>\n";
     // Parcourir les options et les ajouter au HTML
     options.forEach(option => {
-        optionsHTML += "<option  value=\"" + option.IdFrais + "\" data-taux=\"" + option.MontantFrais + "\">" + option.NomFrais + "</option>\n";
+        optionsHTML += "<option  value=\"" + option.IdFrais + "\" data-taux=\"" + option.MontantFrais + "\">" + option.LibelléFrais + "</option>\n";
     });
     return optionsHTML;
 }
@@ -312,6 +419,14 @@ function confirmSupp(table, id, page) {
         case "membres":
             vText = "Voulez-vous vraiment supprimer ce collaborateur définitivement ?";
             url = "../controller.php?suppCollab&page=" + page + "&IdMb=" + id;
+            break;
+        case "groupes":
+            vText = "Voulez-vous vraiment supprimer ce groupe définitivement ?";
+            url = "../controller.php?suppGroupe&page=" + page + "&IdG=" + id;
+            break;
+        case "frais":
+            vText = "Voulez-vous vraiment supprimer ce frais définitivement ?";
+            url = "../controller.php?suppFrais&page=" + page + "&IdFrais=" + id;
             break;
     }
     swal({

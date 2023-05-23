@@ -35,90 +35,67 @@
     }
     $row=$rslt->fetchAll();
 ?>
-
-    <div class="entete">
-        <h1>Liste des missions</h1>
-        <div class="search-add">
-            <form class="d-flex" style="/* margin-top: 37px; */margin-right: 14px;" action="missions.php" method="get">
-                <input class="form-control me-sm-2" type="search" id="searchInput" name="search" placeholder="Search" style="margin-right: -55px!important;border-radius: 11px;height: 41px;">
-                <button class="btn btn-secondary my-2 my-sm-0" type="submit" style="width: 53px;height: 29px;margin-top: 5px !important;margin-right: 3px;background-color: white !important;border: none !important;color: gray !important;">
-                    <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-                </button>
-            </form>
-            <button type="button" class="btn btn-lg btn-primary" style="width: 177px;padding: 5px 2px;height: 38px;font-size: 17px;" data-toggle="modal" data-target="#exampleModalCenter">+ Ajouter mission</button>
+    <div class="card">
+        <div class="card-header">
+            <h4>Liste des missions</h4>
+            <div class="entete">
+                <div class="search-add">
+                    <form class="d-flex" style="/* margin-top: 37px; */margin-right: 14px;" action="missions.php" method="get">
+                        <input class="form-control me-sm-2" type="search" id="searchInput" name="search" placeholder="Search" style="margin-right: -55px!important;border-radius: 11px;height: 41px;">
+                        <button class="btn btn-secondary my-2 my-sm-0" type="submit" style="width: 53px;height: 29px;margin-top: 5px !important;margin-right: 3px;background-color: white !important;border: none !important;color: gray !important;">
+                            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                        </button>
+                    </form>
+                    <button type="button" class="btn btn-lg btn-primary" style="width: 177px;padding: 5px 2px;height: 38px;font-size: 17px;" data-toggle="modal" data-target="#exampleModalCenter">+ Ajouter mission</button>
+                </div>
+            </div>
         </div>
-    </div>
-    <hr>
-    <div class="table table-responsive">
-        <table id="tableMiss" cellspacing='0'>
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Réf mission</th>
-                    <th>Nom collaborateur</th>
-                    <th>Objet mission</th>
-                    <th>Lieu déplacement</th>
-                    <th>Moyen transport</th>
-                    <th>Départ</th>
-                    <th>Retour</th>
-                    <th>Durée</th>
-                    <th>Nuité</th>
-                    <th>Date mission</th>
-                    <th style="width: 168.984px;">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-            <?php
-            foreach ($row as $row) {
-                $Nuité=$row['Durée']-1;
-                echo "
-                <tr>
-                    <td>$row[IdMiss]</td>
-                    <td>$row[RéfMiss]</td>
-                    <td>$row[Nom] $row[Prénom]</td>
-                    <td>$row[ObjMiss]</td>
-                    <td>$row[LieuDép]</td>
-                    <td>$row[MoyTrans]</td>
-                    <td>$row[Départ]</td>
-                    <td>$row[Retour]</td>
-                    <td>$row[Durée] j</td>
-                    <td>$Nuité</td>
-                    <td>$row[DateMiss]</td>
-                    <td class='action'>
-                        <span>
-                            <lord-icon src='https://cdn.lordicon.com/dnmvmpfk.json' class='info' trigger='hover' data-toggle='modal' data-target='#infoMiss' colors='primary:#0d6efd' data-id='$row[IdMiss]' style='width:25px;height:25px;margin-top: 5px'></lord-icon>
-                        </span>
-            ";
-                if($row['StatutMiss']==0){
-                    echo "
-                        <span>
-                            <i class='bx bx-edit icnModifMiss'  data-target='#formModif' data-toggle='modal' data-id='$row[IdMiss]' style='color:orange;margin-top: 4px;font-size: 25px;'></i>
-                        </span>
-                    ";
-                }
-                else{
-                    echo "
-                        <span class='dropdown'>
-                            <button class='btn btn-secondary dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
-                                <i class='fa-sharp fa-solid fa-print' style='color: #ffffff;'></i>
-                            </button>
-                            <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
-                                <a class='dropdown-item' href='../PDF/Ordre_Mission/$row[OrdreMiss]' target='_blank'>Ordre de mission</a>";
-                    if($row['Montant']!=NULL){
-                        echo "  <a class='dropdown-item' href='../PDF/Demande_Remboursement/$row[DemandeRemb]' target='_blank'>Demande de remboursement</a>";
-                    }
-                    else{
-                        echo "  <a class='dropdown-item disabled'>Demande de remboursement</a>";
-                    }
-                        echo"
-                            </div>
-                        </span>
-                    ";
-                }
+        <div class="card-body">
+            <div class="table table-responsive">
+                <table id="tableMission" cellspacing='0'>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Réf</th>
+                            <th>Collaborateur</th>
+                            <th>Objet</th>
+                            <th>Ville</th>
+                            <th>Transport</th>
+                            <th>Départ</th>
+                            <th>Retour</th>
+                            <th>Durée</th>
+                            <th>Nuité</th>
+                            <th>Date mission</th>
+                            <th style="width:100.3906px"><i class="fa-solid fa-gear" style="color: #5a5a5a;"></i></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <?php
+                    foreach ($row as $row) {
+                        $Nuité=$row['Durée']-1;
+                        echo "
+                        <tr>
+                            <td>$row[IdMiss]</td>
+                            <td>$row[RéfMiss]</td>
+                            <td>$row[Nom] $row[Prénom]</td>
+                            <td>$row[ObjMiss]</td>
+                            <td>$row[LieuDép]</td>
+                            <td>$row[MoyTrans]</td>
+                            <td>$row[Départ]</td>
+                            <td>$row[Retour]</td>
+                            <td>$row[Durée] j</td>
+                            <td>$Nuité</td>
+                            <td>$row[DateMiss]</td>
+                            <td class='action'>
+                            <span>
+                            <lord-icon src='https://cdn.lordicon.com/dnmvmpfk.json' class='info' trigger='hover' data-toggle='modal' data-target='#infoMiss' colors='primary:#0d6efd' data-id='$row[IdMiss]' style='width:20px;height:20px;margin-top: 5px'></lord-icon>
+                            </span>
+                            ";
+                            
                 if($row['StatutMiss']==1 && $row['Montant']!=NULL){
                     echo "
                         <span class='dropdown'>
-                            <button class='btn btn-secondary dropdown-toggle green disabled' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
+                            <button class='btn btn-secondary btn-sm dropdown-toggle green disabled' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
                                     <i class='fa-sharp fa-regular fa-circle-check'></i>
                             </button>
                         </span>
@@ -128,27 +105,29 @@
                     if($row['StatutMiss']==0){
                         echo "
                         <span class='dropdown'>
-                            <button class='btn btn-secondary dropdown-toggle blue' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
+                            <button class='btn btn-secondary btn-sm dropdown-toggle red' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
                                 <i class='fa-sharp fa-regular fa-circle-check'></i>
                             </button>
                             <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
                                 <input type='hidden' value='$row[TypeMiss]' id='TypeMiss'>
+                                <a class='dropdown-item icnModifMiss'  data-target='#formModif' data-toggle='modal' data-id='$row[IdMiss]'>Modifier la mission</a>
                                 <a class='dropdown-item' href='../controller.php?validerMiss&IdMiss=$row[IdMiss]&page=$page'>Valider la mission</a>
-                                <a class='dropdown-item disabled' href='javascript:void(0)'  data-id='$row[IdMiss]'  data-toggle='modal' data-target='#validerRemb'>Valider le remboursement</a>
+                                <a class='dropdown-item disabled' href='javascript:void(0)'>Valider le remboursement</a>
                         ";
                     }
                     else{
                         echo "  
                         <span class='dropdown'>
-                            <button class='btn btn-secondary dropdown-toggle green' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
+                            <button class='btn btn-secondary btn-sm dropdown-toggle green' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
                                 <i class='fa-sharp fa-regular fa-circle-check'></i>
                             </button>
                             <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
                                 <input type='hidden' value='$row[TypeMiss]' id='TypeMiss'>
+                                <a class='dropdown-item disabled' href='javascript:void(0)'>Modifier la mission</a>
                                 <a class='dropdown-item disabled' href='javascript:void(0)'>Valider la mission</a>
                             ";
                         if($row['Montant']==NULL){
-                            echo "<a class='dropdown-item' id='lienValiderRemb' href='../controller.php?validerRemb&IdMiss=$row[IdMiss]&page=$page' data-TypeMiss='$row[TypeMiss]' data-id='$row[IdMiss]' data-toggle='modal' data-target='#validerRemb'>Valider le remboursement</a>";
+                            echo "<a class='dropdown-item' id='lienValiderRemb' data-TypeMiss='$row[TypeMiss]' data-id='$row[IdMiss]' data-toggle='modal' data-target='#validerRemb'>Valider le remboursement</a>";
                         }
                         else{
                             echo "<a class='dropdown-item disabled' href='javascript:void(0)'>Valider le remboursement</a>";
@@ -158,45 +137,107 @@
                 echo"
                             </div>
                         </span>
-                        <span>
-                            <i class='fa-sharp fa-solid fa-box-archive fa-2x' style='color:red' onclick='document.location.href=\"../controller.php?archMiss&IdMiss=$row[IdMiss]&page=$page\"'></i>
+                        <span class='dropdown'>
+                        <i class='bx bx-dots-vertical-rounded' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'></i>
+                        <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
+                            <a class='dropdown-item' href='../PDF/Ordre_Mission/$row[OrdreMiss]' target='_blank'>Ordre de mission</a>";
+                            if($row['Montant']!=NULL){
+                            echo "  
+                            <a class='dropdown-item' href='../PDF/Demande_Remboursement/$row[DemandeRemb]' target='_blank'>Demande de remboursement</a>";
+                            }
+                            else{
+                                echo "  <a class='dropdown-item disabled'>Demande de remboursement</a>";
+                            }
+                                echo"
+                                <a class='dropdown-item' onclick='document.location.href=\"../controller.php?archMiss&IdMiss=$row[IdMiss]&page=$page\"'>Archiver</a>
+                            </div>
                         </span>
-                    </td>
-                </tr>";
-            }
-            ?>
-            </tbody>
-        </table>
-    </div>  
-
-    <div>
-        <ul class="pagination">
-            <li class="page-item <?php if($page==1)echo 'disabled'; ?>">
-                <a class="page-link" href="?page=<?php echo $page-1; ?>">&laquo;</a>
-            </li>
-            <?php
-            global $i;
-            for($i=1;$i<=$nbr_de_pages;$i++){
-                if($page != $i){
-                    echo "
-                    <li class='page-item'>
-                        <a class='page-link' href='?page=$i'>$i</a>
-                    </li>";
-                }
-                else{
-                    echo "
-                    <li class='page-item active'>
-                        <a class='page-link' href='?page=$i'>$i</a>
-                    </li>";
-                }
-            }
-            ?>
-            <li class="page-item <?php if($page==$i-1)echo 'disabled'; ?>">
-                <a class="page-link" href="?page=<?php echo $page+1; ?>">&raquo;</a>
-            </li>
-        </ul>
+                            </td>
+                        </tr>";
+                    }
+                    ?>
+                    </tbody>
+                </table>
+            </div>
+            <div>
+                <ul class="pagination">
+                    <li class="page-item <?php if($page==1)echo 'disabled'; ?>">
+                        <a class="page-link" href="?page=<?php echo $page-1; ?>">&laquo;</a>
+                    </li>
+                    <?php
+                    global $i;
+                    for($i=1;$i<=$nbr_de_pages;$i++){
+                        if($page != $i){
+                            echo "
+                            <li class='page-item'>
+                                <a class='page-link' href='?page=$i'>$i</a>
+                            </li>";
+                        }
+                        else{
+                            echo "
+                            <li class='page-item active'>
+                                <a class='page-link' href='?page=$i'>$i</a>
+                            </li>";
+                        }
+                    }
+                    ?>
+                    <li class="page-item <?php if($page==$i-1)echo 'disabled'; ?>">
+                        <a class="page-link" href="?page=<?php echo $page+1; ?>">&raquo;</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
     </div>
-
+    <div class="modal fade" id="validerRemb" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered " role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Valider le remboursement</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="../controller.php?page=1" method="post" enctype="multipart/form-data" onsubmit="return vérifRemb()">
+                        <h5 style="color: #5a5a5a">Type de mission :</h5><hr style="width: 663px;margin-left: 0px !important;"/>
+                            <input type="hidden" name="IdMiss" id="IdMissRemb">
+                            <div class="row g-3 mb-3">
+                                <div class="col">
+                                    <label for="montant">Montant en DHS </label>
+                                    <input type="number" id="Montant" name="Remb" class="form-control" placeholder="Montant à rembourser">
+                                </div>
+                                <div class="col">
+                                    <label for="Paiement">Mode de paiement</label>
+                                    <select class="form-select" id="Paiement" name="Paiement">
+                                    <option value="">Choisir</option>
+                                        <?php 
+                                            $row=DataBase::getData('paiement');
+                                            foreach($row as $row){
+                                                echo "<option value='$row[IdPaiement]'>$row[TypePaiement]</option>";
+                                            }
+                                        ?>
+                                    </select>
+                                </div>
+                            </div>
+                            <div style="align-items: center;display: flex;" onclick="addFile()">
+                                <span>
+                                    <i class="fa-solid fa-square-plus fa-2x" id="addF" style="margin-top: 10px;margin-bottom: 10px;color: gray;"></i>
+                                </span>
+                                <span style="margin-left: 10px;">
+                                    Ajouter une pièce jointe
+                                </span>
+                            </div>
+                            <div id="addFile" style="height: auto;overflow-y: auto;overflow-x: hidden;max-height: 158px;">
+                            </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" style="width: 72px;height: 36px;">Fermer</button>
+                    <button type="submit" name="validerRemb" class="btn btn-primary" style="width: 145px;height: 36px;" onclick='document.getElementById("montant-rembourser").enabled="enabled";'>Enregistrer</button>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
     <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
@@ -438,58 +479,7 @@
         </div>
     </div>
 
-    <div class="modal fade" id="validerRemb" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered " role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Valider le remboursement</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                <form action="../controller.php?page=1" method="post" enctype="multipart/form-data" onsubmit="return vérifRemb()">
-                    <h5 style="color: #5a5a5a">Type de mission : Journaliere</h5><hr style="width: 663px;margin-left: 0px !important;">
-                        <input type="hidden" name="IdMiss" id="IdMissRemb">
-                        <div class="row g-3 mb-3">
-                            <div class="col">
-                                <label for="montant">Montant en DHS </label>
-                                <input type="number" id="Montant" name="Remb" class="form-control" placeholder="Montant à rembourser">
-                            </div>
-                            <div class="col">
-                                <label for="Paiement">Mode de paiement</label>
-                                <select class="form-select" id="Paiement" name="Paiement">
-                                <option value="">Choisir</option>
-                                    <?php 
-                                        $row=DataBase::getData('paiement');
-                                        foreach($row as $row){
-                                            echo "<option value='$row[IdPaiement]'>$row[TypePaiement]</option>";
-                                        }
-                                    ?>
-                                </select>
-                            </div>
-                        </div>
-                        <div style="align-items: center;display: flex;" onclick="addFile()">
-                            <span>
-                                <i class="fa-solid fa-square-plus fa-2x" id="addF" style="margin-top: 10px;margin-bottom: 10px;color: gray;"></i>
-                            </span>
-                            <span style="margin-left: 10px;">
-                                Ajouter une pièce jointe
-                            </span>
-                        </div>
-                        <div id="addFile" style="height: auto;overflow-y: auto;overflow-x: hidden;max-height: 158px;">
-                            <?php
-                            $row=\Tets\Oop\DataBase::getData('frais');
-                            ?>
-                        </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal" style="width: 72px;height: 36px;">Fermer</button>
-                    <button type="submit" name="validerRemb" class="btn btn-primary" style="width: 145px;height: 36px;" onclick='document.getElementById("montant-rembourser").enabled="enabled";'>Enregistrer</button>
-                </div>
-                </form>
-            </div>
-        </div>
-    </div>
+
 
 <?php
     if(isset($_SESSION['erreur'])){

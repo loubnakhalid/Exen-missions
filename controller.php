@@ -1,5 +1,6 @@
 <?php
 
+use Tets\Oop\DataBase;
 use \Tets\Oop\Membre;
 
 session_start();
@@ -61,10 +62,10 @@ if(isset($_POST['con'])) {
                 }
                 //Redirection selon le type de membre (Admin ou collab)----------------------------------------------------------------------------------//
                 if(Membre::Admin()){
-                    header("location:./Admin/index.php");
+                    header("location:./Admin/index.html");
                 }
                 elseif(Membre::Collab()){
-                    header("location:./Collab/index.php");
+                    header("location:./Collab/index.html");
                 }
             } else {
                 $_SESSION['errMdpsLog'] = 'Mot de passe incorrecte ! Veuillez réssayer';
@@ -408,6 +409,58 @@ elseif(isset($_GET['suppMiss']) && isset($_GET['IdMiss'])){
     $_SESSION['success']="Mission supprimée avec succés ! ";
     header("location:./admin/archives.php?page=$_GET[page]");
 }
+elseif(isset($_POST['ajtGroupe'])){
+    $Libellé=$_POST['Libellé'];
+    $TauxG=$_POST['TauxG'];
+    DataBase::insertData('groupes',array(
+        "Libellé" => $Libellé,
+        "TauxG" => $TauxG,
+    ));
+    $_SESSION['success']="Groupe ajouté avec succés ! ";
+    header("location:./admin/groupes.php");
+}
+elseif(isset($_POST['modifGroupe'])){
+    $IdG=$_POST['IdG'];
+    $Libellé=$_POST['Libellé'];
+    $TauxG=$_POST['TauxG'];
+    DataBase::updateData('groupes',array(
+        "Libellé" => $Libellé,
+        "TauxG" => $TauxG,
+    ),"IdG=$IdG");
+    $_SESSION['success']="Groupe modifié avec succés ! ";
+    header("location:./admin/groupes.php");
+}
+elseif(isset($_GET['suppGroupe']) && isset($_GET['IdG'])){
+    \Tets\Oop\DataBase::deleteData('groupes',"IdG=$_GET[IdG]");
+    $_SESSION['success']="Groupe supprimée avec succés ! ";
+    header("location:./admin/groupes.php?page=$_GET[page]");
+}
+elseif(isset($_POST['ajtFrais'])){
+    $LibelléFrais=$_POST['LibelléFrais'];
+    $MontantFrais=$_POST['MontantFrais'];
+    DataBase::insertData('frais',array(
+        "LibelléFrais" => $LibelléFrais,
+        "MontantFrais" => $MontantFrais,
+    ));
+    $_SESSION['success']="Frais ajouté avec succés ! ";
+    header("location:./admin/frais.php");
+}
+elseif(isset($_POST['modifFrais'])){
+    $IdFrais=$_POST['IdFrais'];
+    $LibelléFrais=$_POST['LibelléFrais'];
+    $MontantFrais=$_POST['MontantFrais'];
+    DataBase::updateData('frais',array(
+        "LibelléFrais" => $LibelléFrais,
+        "MontantFrais" => $MontantFrais,
+    ),"IdFrais=$IdFrais");
+    $_SESSION['success']="frais modifié avec succés ! ";
+    header("location:./admin/frais.php");
+}
+elseif(isset($_GET['suppFrais']) && isset($_GET['IdFrais'])){
+    \Tets\Oop\DataBase::deleteData('frais',"IdFrais=$_GET[IdFrais]");
+    $_SESSION['success']="Frais supprimée avec succés ! ";
+    header("location:./admin/frais.php?page=$_GET[page]");
+}
 elseif(isset($_POST['IdMb']) && isset($_POST['getCollab'])){
     $con=\Tets\Oop\DataBase::connect();
     $rslt=$con->query("select * from membres natural join groupes where IdMb=$_POST[IdMb]");
@@ -449,13 +502,19 @@ elseif(isset($_POST['IdMiss']) && isset($_POST['getMiss'])){
 }
 elseif (isset($_POST['getGroupes'])) {
     $con = \Tets\Oop\DataBase::connect();
-    $rslt = $con->query("SELECT * FROM groupes");
+    if(isset($_POST['IdG'])){
+        $rslt = $con->query("SELECT * FROM groupes where IdG=$_POST[IdG]");
+    }
+    else{
+        $rslt = $con->query("SELECT * FROM groupes");
+    }    
     $groupes = array();
 
     while ($row = $rslt->fetch()) {
         $groupes[] = array(
             'IdG' => $row['IdG'],
-            'Libellé' => $row['Libellé']
+            'Libellé' => $row['Libellé'],
+            'TauxG' => $row['TauxG'],
         );
     }
 
@@ -463,12 +522,17 @@ elseif (isset($_POST['getGroupes'])) {
 }
 elseif(isset($_GET['getFrais'])){
     $con=\Tets\Oop\DataBase::connect();
-    $rslt=$con->query('select * from frais');
+    if(isset($_GET['IdFrais'])){
+        $rslt=$con->query("select * from frais where IdFrais=$_GET[IdFrais]");
+    }
+    else{
+        $rslt=$con->query('select * from frais');
+    }
     $options = array();
     if ($rslt->rowCount() > 0) {
         while ($row = $rslt->fetch()) {
             $options[] = array(
-                'NomFrais' => $row['NomFrais'],
+                'LibelléFrais' => $row['LibelléFrais'],
                 'MontantFrais' => $row['MontantFrais'],
                 'IdFrais' => $row['IdFrais'],
             );

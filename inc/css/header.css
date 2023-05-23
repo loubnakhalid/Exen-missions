@@ -1,5 +1,67 @@
 body {
     overflow-x: hidden;
+    background-color: #fbfbfb;
+}
+
+@media (min-width: 991.98px) {
+    main {
+        padding-left: 240px;
+    }
+}
+
+.navbar {
+    left: 240px !important;
+    box-shadow: 0 2px 5px 0 rgb(0 0 0 / 5%), 0 2px 10px 0 rgb(0 0 0 / 5%);
+}
+
+.navbar-brand {
+    margin-left: 47px;
+    margin-bottom: 41px;
+}
+
+
+/* Sidebar */
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    /*padding: 58px 0 0;*/
+    /* Height of navbar */
+    width: 240px;
+    z-index: 600;
+}
+
+.list-group-item {
+    color: white !important;
+    margin-bottom: 19px;
+    border: none !important;
+    background-color: #1e8af7 !important;
+}
+
+@media (max-width: 991.98px) {
+    .sidebar {
+        width: 100%;
+    }
+}
+
+.sidebar .active {
+    color: #58baeb !important;
+    background-color: white !important;
+    border-radius: 5px;
+    /*box-shadow: 0 2px 5px 0 #58baeb, 0 2px 10px 0 #58baeb;*/
+    border: none !important;
+}
+
+.sidebar-sticky {
+    position: relative;
+    top: 0;
+    height: calc(100vh - 48px);
+    padding-top: 0.5rem;
+    overflow-x: hidden;
+    overflow-y: auto;
+    /* Scrollable contents if viewport is shorter than content. */
 }
 
 h1 {
@@ -13,6 +75,13 @@ hr {
     margin-left: 25px !important;
 }
 
+.card-header {
+    padding: 1rem 1rem !important;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
 .table {
     /* box-shadow: rgba(163, 163, 163, 0.39) 0px 5px 11px -4.5px; */
     height: auto;
@@ -20,17 +89,16 @@ hr {
     top: 3px;
     width: 100%;
     transition: all 0.8s ease;
-    overflow: visible !important;
+    /*overflow: visible !important;*/
     position: relative;
-    margin-left: 23px;
 }
 
 table {
     gap: 60px;
     /* overflow: visible; */
-    width: 96%;
     border: 1px solid whitesmoke;
     overflow-y: auto;
+    width: 100%;
     height: auto;
     background-color: #ffffff;
 }
@@ -39,7 +107,7 @@ table thead {
     font-weight: normal;
     color: #5a5a5a;
     height: 50px;
-    font-size: 15px;
+    font-size: 14px;
     text-align: center;
 }
 
@@ -54,7 +122,7 @@ table td {
     background-color: inherit;
     text-align: center;
     border-top: 1px solid rgb(240, 240, 240);
-    font-size: 14px;
+    font-size: 13px;
     color: rgb(69, 87, 106);
 }
 
@@ -82,9 +150,7 @@ table td.action input {
 }
 
 .search-add {
-    margin-right: 37px;
     display: flex;
-    margin-top: 44px;
     align-items: center;
 }
 
@@ -124,9 +190,25 @@ table td.action input {
 }
 
 .green {
-    background-color: #1c9b1c !important;
+    background-color: #3ec93e !important;
 }
 
 .blue {
-    background-color: #58baea !important;
+    background-color: #1e8af7 !important;
+}
+
+.red {
+    background-color: #ff5252 !important;
+}
+
+.left::after {
+    margin-left: 1.255em !important;
+}
+
+.gray {
+    color: #8b8b8b !important;
+}
+
+.greenText {
+    color: #3ec93e !important;
 }

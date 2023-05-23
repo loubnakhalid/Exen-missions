@@ -1,5 +1,13 @@
+const links = document.querySelectorAll('#navbar-list a');
+
+// Parcourir les liens et vérifier si l'URL correspond à la page active
+links.forEach(link => {
+    if (link.href === window.location.href) {
+        link.classList.add('active');
+    }
+});
 $(document).ready(function() {
-    var table = $('#tableMiss').DataTable({
+    var table = $('#tableMission').DataTable({
         lengthChange: false,
         ordering: false,
         info: false,
@@ -10,6 +18,55 @@ $(document).ready(function() {
         var searchText = $(this).val();
         table.search(searchText).draw();
     });
+});
+$(document).ready(function() {
+    var navbar = document.getElementById('main-navbar');
+    var navbarBrand = document.getElementById('navbar-brand');
+    var navbarList = document.getElementById('navbar-list');
+    var sidebar = document.getElementById('sidebarMenu');
+    var windowWidth = window.innerWidth;
+    if (windowWidth < 992) {
+        navbar.setAttribute("style", "left:0 !important");
+        navbarBrand.remove();
+        sidebar.setAttribute("style", "padding:58px 0 0");
+    }
+});
+window.addEventListener('resize', function() {
+    var navbar = document.getElementById('main-navbar');
+    var navbarBrand = document.getElementById('navbar-brand');
+    var navbarList = document.getElementById('navbar-list');
+    var sidebar = document.getElementById('sidebarMenu');
+    var windowWidth = window.innerWidth;
+
+    if (windowWidth < 992) {
+        navbar.setAttribute("style", "left:0 !important");
+        navbarBrand.remove();
+        sidebar.setAttribute("style", "padding:58px 0 0");
+    } else {
+        navbar.style.left = '';
+        sidebar.style.padding = "";
+        if (!navbarList.contains(navbarBrand)) {
+            navbarList.innerHTML = '<a id="navbar-brand" class="navbar-brand " href="#"> <img src = "../inc/img/logo.svg" alt = "" loading = "lazy" width = "100px" ></a>' + navbarList.innerHTML;
+        }
+    }
+});
+var button = document.querySelector('.navbar-toggler');
+button.addEventListener('click', function() {
+    // Récupérer l'élément cible du bouton
+    var target = document.querySelector(button.getAttribute('data-bs-target'));
+
+    // Vérifier si l'élément cible est déjà affiché ou masqué
+    var isExpanded = button.getAttribute('aria-expanded') === 'true';
+
+    // Afficher ou masquer l'élément cible en fonction de son état actuel
+    if (isExpanded) {
+        target.classList.remove('show');
+        button.setAttribute('aria-expanded', 'false');
+    } else {
+        target.classList.add('show');
+        button.setAttribute('aria-expanded', 'true');
+        document.getElementsByClassName('navbar').style.left = "0px !important";
+    }
 });
 $(document).on("click", "#lienValiderRemb", function() {
     var IdMiss = $(this).data('id');
@@ -164,6 +221,44 @@ $(document).ready(function() {
 
                 // Sélectionner l'option correspondante dans le sélecteur #IdG
                 selectElement.val(selectedIdG);
+            },
+            error: function() {
+                alert('Une erreur s\'est produite lors de la récupération des informations de la mission.');
+            }
+        });
+    });
+});
+$(document).ready(function() {
+    $('.icnModifGroupe').click(function() {
+        var IdG = $(this).data('id');
+        $('#IdGModif').val(IdG);
+        $.ajax({
+            url: '../controller.php',
+            type: 'POST',
+            data: { IdG: IdG, getGroupes: true },
+            dataType: 'json',
+            success: function(response) {
+                $('#LibelléModif').val(response[0].Libellé);
+                $('#TauxModif').val(response[0].TauxG);
+            },
+            error: function() {
+                alert('Une erreur s\'est produite lors de la récupération des informations de la mission.');
+            }
+        });
+    });
+});
+$(document).ready(function() {
+    $('.icnModifFrais').click(function() {
+        var IdFrais = $(this).data('id');
+        $('#IdFraisModif').val(IdFrais);
+        $.ajax({
+            url: '../controller.php',
+            type: 'GET',
+            data: { IdFrais: IdFrais, getFrais: true },
+            dataType: 'json',
+            success: function(response) {
+                $('#LibelléFraisModif').val(response[0].LibelléFrais);
+                $('#MontantFraisModif').val(response[0].MontantFrais);
             },
             error: function() {
                 alert('Une erreur s\'est produite lors de la récupération des informations de la mission.');

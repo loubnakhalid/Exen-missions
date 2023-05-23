@@ -1,15 +1,15 @@
 <?php
 
-use Tets\Oop\Membre;
+  use Tets\Oop\Membre;
 
-session_start();
-if(!Membre::Admin()){
+  session_start();
+  if(!Membre::Admin()){
     header("location:../index.php");
-}
+  }
 ?>
 <!doctype html>
 <html lang="en">
-
+  
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
@@ -24,51 +24,105 @@ if(!Membre::Admin()){
     <script src="https://kit.fontawesome.com/9f23a76265.js" crossorigin="anonymous"></script>
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
-    <link rel="stylesheet" href="/resources/demos/style.css">
     <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>  
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <link rel="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" type="text/css" />
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.2/Chart.min.js"></script>
     <script src="../inc/js/functions.js"></script>
     <title>Document</title>
 </head>
 
 <body>
-    <div>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="#"><img src="../inc/img/logoB.svg" style="width: 79px"></a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarColor01">
-                    <ul class="navbar-nav me-auto">
-                        <li class="nav-item">
-                            <a class="nav-link active" href="accueil.php">Accueil
-                                <span class="visually-hidden">(current)</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="missions.php">Missions</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="archives.php">Archives</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="collabs.php">Collaborateurs</a>
-                        </li>
-                    </ul>
-                    <div class='d-flex dropdown'>
-                        <button class='btn btn-secondary dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'  style='background-color: white !important;width: 161px;color: gray !important;border: none !important;height: 33px;'>
-                            Bonjour admin
-                        </button>
-                        <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
-                            <a class='dropdown-item' href='profil.php'>Profil</a>
-                            <a class='dropdown-item' href='../controller.php?décon'>Déconnexion</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </nav>
+    <!--Main Navigation-->
+<header>
+  <!-- Sidebar -->
+  <nav
+       id="sidebarMenu"
+       class="collapse d-lg-block sidebar collapse blue"
+       >
+    <div class="position-sticky">
+      <div id="navbar-list" class="list-group list-group-flush mx-3 mt-4">
+        <a id="navbar-brand" class="navbar-brand" href="#">
+            <img src="../inc/img/logo.svg" alt="" loading="lazy" width="100px">
+        </a>
+        <a
+           href="accueil.php"
+           class="list-group-item list-group-item-action py-2 ripple"
+           aria-current="true"
+           >
+          <i class="fas fa-tachometer-alt fa-fw me-3"></i
+            ><span>Accueil</span>
+        </a>
+        <a
+           href="missions.php"
+           class="list-group-item list-group-item-action py-2 ripple left dropdown-toggle"
+           id="miss-drop"
+           >
+          <i class="fas fa-chart-area fa-fw me-3"></i
+            ><span>Missions</span>
+        </a>
+        <div class="ps-4" id="archives"> <!-- Add a div for the submenu -->
+        <a href="archives.php" class="list-group-item list-group-item-action py-2 ripple">
+          <i class="fa-sharp fa-solid fa-box-archive fa-fw me-3"></i><span>Archives</span>
+        </a>
+      </div>
+          <a
+           href="collabs.php"
+           class="list-group-item list-group-item-action py-2 ripple"
+           ><i class="fas fa-users fa-fw me-3"></i><span>Collaborateus</span></a
+          >
+        <a
+           href="groupes.php"
+           class="list-group-item list-group-item-action py-2 ripple"
+           >
+          <i class="fas fa-chart-pie fa-fw me-3"></i><span>Groupes</span>
+        </a>
+        <a
+           href="frais.php"
+           class="list-group-item list-group-item-action py-2 ripple"
+           ><i class="fas fa-chart-bar fa-fw me-3"></i><span>Frais</span></a
+          >
+      </div>
     </div>
+  </nav>
+  <!-- Sidebar -->
+
+  <!-- Navbar -->
+  <nav id="main-navbar" class="navbar navbar-expand-lg navbar-light bg-white fixed-top">
+    <!-- Container wrapper -->
+    <div class="container-fluid">
+      <!-- Toggle button -->
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="fas fa-bars" aria-hidden="true"></i>
+      </button>
+
+      <!-- Right links -->
+      <ul class="navbar-nav ms-auto d-flex flex-row">
+
+        <!-- Avatar -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle hidden-arrow d-flex align-items-center" href="#" id="navbarDropdownMenuLink" role="button" data-mdb-toggle="dropdown" aria-expanded="false">
+            Bonjour ADMIN
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
+            <li><a class="dropdown-item" href="#">My profile</a></li>
+            <li><a class="dropdown-item" href="#">Settings</a></li>
+            <li><a class="dropdown-item" href="#">Logout</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+    <!-- Container wrapper -->
+  </nav>
+  <!-- Navbar -->
+</header>
+<!--Main Navigation-->
+
+<!--Main layout-->
+<main style="margin-top: 58px">
+  <div class="container pt-4">
