@@ -1,76 +1,45 @@
-<span>
-                            <lord-icon src='https://cdn.lordicon.com/dnmvmpfk.json' class='info' trigger='hover' data-toggle='modal' data-target='#infoMiss' colors='primary:#0d6efd' data-id='$row[IdMiss]' style='width:25px;height:25px;margin-top: 5px'></lord-icon>
-                        </span>
-            ";
-                if($row['StatutMiss']==0){
-                    echo "
-                        <span>
-                            <i class='bx bx-edit icnModifMiss'  data-target='#formModif' data-toggle='modal' data-id='$row[IdMiss]' style='color:orange;margin-top: 4px;font-size: 25px;'></i>
-                        </span>
-                    ";
-                }
-                else{
-                    echo "
-                        <span class='dropdown'>
-                            <button class='btn btn-secondary btn-sm dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
-                                <i class='fa-sharp fa-solid fa-print' style='color: #ffffff;'></i>
-                            </button>
-                            <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
-                                <a class='dropdown-item' href='../PDF/Ordre_Mission/$row[OrdreMiss]' target='_blank'>Ordre de mission</a>";
-                    if($row['Montant']!=NULL){
-                        echo "  <a class='dropdown-item' href='../PDF/Demande_Remboursement/$row[DemandeRemb]' target='_blank'>Demande de remboursement</a>";
-                    }
-                    else{
-                        echo "  <a class='dropdown-item disabled'>Demande de remboursement</a>";
-                    }
-                        echo"
-                            </div>
-                        </span>
-                    ";
-                }
-                if($row['StatutMiss']==1 && $row['Montant']!=NULL){
-                    echo "
-                        <span class='dropdown'>
-                            <button class='btn btn-secondary btn-sm dropdown-toggle green disabled' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
-                                    <i class='fa-sharp fa-regular fa-circle-check'></i>
-                            </button>
-                        </span>
-                    ";
-                }
-                else{
-                    if($row['StatutMiss']==0){
-                        echo "
-                        <span class='dropdown'>
-                            <button class='btn btn-secondary btn-sm dropdown-toggle red' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
-                                <i class='fa-sharp fa-regular fa-circle-check'></i>
-                            </button>
-                            <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
-                                <input type='hidden' value='$row[TypeMiss]' id='TypeMiss'>
-                                <a class='dropdown-item' href='../controller.php?validerMiss&IdMiss=$row[IdMiss]&page=$page'>Valider la mission</a>
-                                <a class='dropdown-item disabled' href='javascript:void(0)'  data-id='$row[IdMiss]'  data-toggle='modal' data-target='#validerRemb'>Valider le remboursement</a>
-                        ";
-                    }
-                    else{
-                        echo "  
-                        <span class='dropdown'>
-                            <button class='btn btn-secondary btn-sm dropdown-toggle green' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
-                                <i class='fa-sharp fa-regular fa-circle-check'></i>
-                            </button>
-                            <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
-                                <input type='hidden' value='$row[TypeMiss]' id='TypeMiss'>
-                                <a class='dropdown-item disabled' href='javascript:void(0)'>Valider la mission</a>
-                            ";
-                        if($row['Montant']==NULL){
-                            echo "<a class='dropdown-item' id='lienValiderRemb' href='../controller.php?validerRemb&IdMiss=$row[IdMiss]&page=$page' data-TypeMiss='$row[TypeMiss]' data-id='$row[IdMiss]' data-toggle='modal' data-target='#validerRemb'>Valider le remboursement</a>";
-                        }
-                        else{
-                            echo "<a class='dropdown-item disabled' href='javascript:void(0)'>Valider le remboursement</a>";
-                        }
-                    }
-                }
-                echo"
-                            </div>
-                        </span>
-                        <span>
-                            <i class='fa-sharp fa-solid fa-box-archive fa-2x' style='color:red' onclick='document.location.href=\"../controller.php?archMiss&IdMiss=$row[IdMiss]&page=$page\"'></i>
-                        </span>
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>How To Add Bootstrap 5 Datepicker - Techsolutionstuff</title>
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-alpha3/dist/css/bootstrap.min.css">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">		
+		<style>
+			.input-group-append {
+				cursor: pointer;
+			}
+			body{
+				margin:80px !important;
+			}
+		</style>
+	</head>
+<body>
+<section class="container">
+  	<h3 class="py-2 mb-4">How To Add Bootstrap 5 Datepicker - Techsolutionstuff</h3>
+	<form class="row">
+		<label for="date" class="col-1 col-form-label">Date</label>
+		<div class="col-5">
+		<div class="input-group date" id="datepicker">
+			<input type="text" class="form-control" id="date"/>
+			<span class="input-group-append">
+			<span class="input-group-text bg-light d-block">
+				<i class="fa fa-calendar"></i>
+			</span>
+			</span>
+		</div>
+		</div>
+	</form>
+</section>
+</body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+<script>
+	$(function(){
+		$('#datepicker').datepicker();
+	});
+</script>
+</html>

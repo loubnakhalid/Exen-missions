@@ -1,6 +1,6 @@
 <?php
 /*******************************************************************************
-* FPDF                                                                         *
+* Ff()F                                                                         *
 *                                                                              *
 * Version: 1.85                                                                *
 * Date:    2022-11-10                                                          *
@@ -1954,11 +1954,8 @@ class PDF extends FPDF
 		$this->Line(10,65,200,65);
 		$this->SetLineWidth(50);
 		$this->Ln(25);
-
-
 		//$this->Cell(60,8,iconv("UTF-8", "CP1250//TRANSLIT", "Tél: 00 212 05 36 68 45 45 - siteweb : www.exen.ma"),0,1,'C',false);
 		//$this->Cell(60,8,iconv("UTF-8", "CP1250//TRANSLIT", "Tél: 00 212 05 36 68 45 45 - siteweb : www.exen.ma"),0,1,'C',false);
-
 	}
 	// Footer
 	function Footer() {

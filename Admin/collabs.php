@@ -130,7 +130,6 @@
         </div>
     </div>
 
-
 <div class="modal fade" id="ajtCollab" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content ">
@@ -204,6 +203,7 @@
         </div>
     </div>
 </div>
+
 <div class="modal fade" id="modifCollab" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content ">
@@ -272,6 +272,7 @@
         </div>
     </div>
 </div>
+
 <div class="modal fade" id="infoCollab" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content ">
@@ -333,6 +334,7 @@
         </div>
     </div>
 </div>
+
 <div class="modal fade" id="collabMiss" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content ">
@@ -350,34 +352,35 @@
         </div>
     </div>
 </div>
+
 <?php 
-if(isset($_SESSION['erreurEmail']) || isset($_SESSION['erreurCIN'])){
-    echo "<script>document.getElementById('btnAjtCollab').click();</script>";
-    if(isset($_SESSION['erreurEmail'])){
-        echo "
-        <script>
-            var Email = document.getElementById('EmailAjt');
-            Email.classList+=' is-invalid';
-            var err=document.getElementById('errEmailAjt'); 
-            err.style.display='block'; 
-            err.innerHTML='$_SESSION[erreurEmail]';
-        </script>
-        ";
-        unset($_SESSION["erreurEmail"]);
+    if(isset($_SESSION['erreurEmail']) || isset($_SESSION['erreurCIN'])){
+        echo "<script>document.getElementById('btnAjtCollab').click();</script>";
+        if(isset($_SESSION['erreurEmail'])){
+            echo "
+            <script>
+                var Email = document.getElementById('EmailAjt');
+                Email.classList+=' is-invalid';
+                var err=document.getElementById('errEmailAjt'); 
+                err.style.display='block'; 
+                err.innerHTML='$_SESSION[erreurEmail]';
+            </script>
+            ";
+            unset($_SESSION["erreurEmail"]);
+        }
+        if(isset($_SESSION['erreurCIN'])){
+            echo "
+            <script>
+                var CIN = document.getElementById('CINAjt');
+                CIN.classList+=' is-invalid';
+                var err=document.getElementById('errCINAjt'); 
+                err.style.display='block'; 
+                err.innerHTML='$_SESSION[erreurCIN]';
+            </script>
+            ";
+            unset($_SESSION["erreurCIN"]);
+        }
     }
-    if(isset($_SESSION['erreurCIN'])){
-        echo "
-        <script>
-            var CIN = document.getElementById('CINAjt');
-            CIN.classList+=' is-invalid';
-            var err=document.getElementById('errCINAjt'); 
-            err.style.display='block'; 
-            err.innerHTML='$_SESSION[erreurCIN]';
-        </script>
-        ";
-        unset($_SESSION["erreurCIN"]);
-    }
-}
 ?>
 <?php
     if(isset($_SESSION['erreur'])){

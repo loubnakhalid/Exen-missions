@@ -1,0 +1,261 @@
+.heading-section {
+    font-size: 28px !important;
+    color: #000 !important;
+}
+
+.img {
+    background-size: cover !important;
+    background-repeat: no-repeat!important;
+    background-position: center center !important;
+}
+
+.elegant-calencar {
+    max-width: 700px !important;
+    text-align: center !important;
+    position: relative !important;
+    margin: 0 auto !important;
+    overflow: hidden !important;
+    border-radius: 5px !important;
+    -webkit-box-shadow: 0px 19px 27px -20px rgba(0, 0, 0, 0.16) !important;
+    -moz-box-shadow: 0px 19px 27px -20px rgba(0, 0, 0, 0.16) !important;
+    box-shadow: 0px 19px 27px -20px rgba(0, 0, 0, 0.16) !important;
+}
+
+.wrap-header {
+    position: relative !important;
+    width: 35% !important;
+    z-index: 0 !important;
+}
+
+.wrap-header:after {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0!important;
+    content: '' !important;
+    background: #000 !important;
+    opacity: .5 !important;
+    z-index: -1 !important;
+}
+
+@media (max-width: 767.98px) {
+    .wrap-header {
+        width: 100% !important;
+        padding: 20px 0 !important;
+    }
+}
+
+#header {
+    width: 100% !important;
+    position: relative !important;
+}
+
+#header .pre-button,
+#header .next-button {
+    cursor: pointer !important;
+    width: 1em !important;
+    height: 1em !important;
+    line-height: 1em!important;
+    border-radius: 50% !important;
+    position: absolute !important;
+    top: 50%;
+    -webkit-transform: translateY(-50%) !important;
+    -ms-transform: translateY(-50%) !important;
+    transform: translateY(-50%) !important;
+    font-size: 18px !important;
+}
+
+#header .pre-button i,
+#header .next-button i {
+    color: #fff !important;
+}
+
+.pre-button {
+    left: 5px !important;
+}
+
+.next-button {
+    right: 5px !important;
+}
+
+.button-wrap {
+    position: relative !important;
+    padding: 10px 0 !important;
+}
+
+.button-wrap .pre-button,
+.button-wrap .next-button {
+    cursor: pointer !important;
+    width: 1em !important;
+    height: 1em !important;
+    line-height: 1em !important;
+    border-radius: 50% !important;
+    position: absolute !important;
+    top: 0 !important;
+    font-size: 18px !important;
+}
+
+.button-wrap .pre-button i,
+.button-wrap .next-button i {
+    color: #cccccc !important;
+}
+
+.button-wrap .pre-button {
+    left: 20px !important;
+}
+
+.button-wrap .next-button {
+    right: 20px !important;
+}
+
+.head-day {
+    font-size: 9em !important;
+    line-height: 1 !important;
+    color: #fff !important;
+}
+
+.head-month {
+    font-size: 2em !important;
+    line-height: 1 !important;
+    color: #fff !important;
+    font-size: 16px !important;
+    text-transform: uppercase !important;
+    font-weight: 300 !important;
+}
+
+.calendar-wrap {
+    width: 65% !important;
+    background: #fff !important;
+    padding: 40px 20px 20px 20px !important;
+}
+
+@media (max-width: 767.98px) {
+    .calendar-wrap {
+        width: 100% !important;
+    }
+}
+
+#calendar {
+    width: 100% !important;
+}
+
+#calendar tr {
+    height: 3em !important;
+}
+
+#calendar thead tr {
+    color: #000 !important;
+    font-weight: 700 !important;
+}
+
+#calendar tbody tr {
+    color: #000 !important;
+}
+
+#calendar td {
+    width: 14% !important;
+    border-radius: 50% !important;
+    cursor: pointer !important;
+    -webkit-transition: all 0.2s ease-in !important;
+    -o-transition: all 0.2s ease-in !important;
+    transition: all 0.2s ease-in !important;
+    position: relative !important;
+    z-index: 0 !important;
+}
+
+#calendar td:after {
+    position: absolute !important;
+    top: 50% !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    content: '' !important;
+    width: 44px !important;
+    height: 44px !important;
+    margin: 0 auto !important;
+    -webkit-transform: translateY(-50%) !important;
+    -ms-transform: translateY(-50%) !important;
+    transform: translateY(-50%) !important;
+    border-radius: 50% !important;
+    -webkit-transition: 0.3s !important;
+    -o-transition: 0.3s !important;
+    transition: 0.3s !important;
+    z-index: -1 !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #calendar td:after {
+        -webkit-transition: none !important;
+        -o-transition: none !important;
+        transition: none !important;
+    }
+}
+
+#calendar td:hover,
+.selected {
+    color: #fff !important;
+    border: none !important;
+}
+
+#calendar td:hover:after,
+.selected:after {
+    background: #2a3246 !important;
+}
+
+#calendar td:active {
+    -webkit-transform: scale(0.7) !important;
+    -ms-transform: scale(0.7) !important;
+    transform: scale(0.7) !important;
+}
+
+#today {
+    color: #fff !important;
+}
+
+#today:after {
+    background: #e13a9d !important;
+}
+
+#disabled {
+    cursor: default !important;
+    background: #fff !important;
+}
+
+#disabled:hover {
+    background: #fff !important;
+    color: #c9c9c9 !important;
+}
+
+#disabled:hover:after {
+    background: transparent !important;
+}
+
+#reset {
+    display: block !important;
+    position: absolute !important;
+    right: 0.5em !important;
+    top: 0.5em !important;
+    z-index: 999 !important;
+    color: rgba(255, 255, 255, 0.7) !important;
+    cursor: pointer !important;
+    padding: 0 0.5em !important;
+    border: 1px solid rgba(255, 255, 255, 0.4) !important;
+    border-radius: 4px !important;
+    -webkit-transition: all 0.3s ease !important;
+    -o-transition: all 0.3s ease !important;
+    transition: all 0.3s ease !important;
+    text-transform: uppercase !important;
+    font-size: 11px !important;
+}
+
+#reset:hover {
+    color: #fff !important;
+    border-color: #fff !important;
+}
+
+#reset:active {
+    -webkit-transform: scale(0.8) !important;
+    -ms-transform: scale(0.8) !important;
+    transform: scale(0.8) !important;
+}

@@ -1,7 +1,5 @@
 <?php
-
     use Tets\Oop\DataBase;
-
     require "../vendor/autoload.php";
     include "./inc/header.php";
     $con=\Tets\Oop\DataBase::connect();
@@ -28,13 +26,13 @@
     //les enregistrements
     if(isset($_GET['search'])){
         $rslt=$con->query("select * from missions natural join membres where DeletedAt is null and (RéfMiss like '%$_GET[search]%' or Nom like '%$_GET[search]%' or Prénom like '%$_GET[search]%' or LieuDép like '%$_GET[search]%' or ObjMiss like '%$_GET[search]%')  order by IdMiss desc limit $debut,$nbr_elements_par_page");
-
     }
     else{
         $rslt=$con->query("select * from missions natural join membres where DeletedAt is null order by IdMiss desc limit $debut,$nbr_elements_par_page");
     }
     $row=$rslt->fetchAll();
 ?>
+
     <div class="card">
         <div class="card-header">
             <h4>Liste des missions</h4>
@@ -46,7 +44,7 @@
                             <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
                         </button>
                     </form>
-                    <button type="button" class="btn btn-lg btn-primary" style="width: 177px;padding: 5px 2px;height: 38px;font-size: 17px;" data-toggle="modal" data-target="#exampleModalCenter">+ Ajouter mission</button>
+                    <button type="button" class="btn btn-lg btn-primary" style="width: 177px;padding: 5px 2px;height: 38px;font-size: 17px;" data-toggle="modal" data-target="#formAjt">+ Ajouter mission</button>
                 </div>
             </div>
         </div>
@@ -66,12 +64,23 @@
                             <th>Durée</th>
                             <th>Nuité</th>
                             <th>Date mission</th>
+                            <th>Pièces</th>
                             <th style="width:100.3906px"><i class="fa-solid fa-gear" style="color: #5a5a5a;"></i></th>
                         </tr>
                     </thead>
                     <tbody>
                     <?php
                     foreach ($row as $row) {
+                        $con=DataBase::connect();
+                        $rsltPJ=$con->query("select * from piècesjointes where IdMiss=$row[IdMiss]");
+                        if($rsltPJ->rowCount()!=0){
+                            $PJ=$rsltPJ->rowCount();
+                            $style="text-decoration:underline;background-color: white;border: none;color:blue";
+                        }
+                        else{
+                            $PJ='-';
+                            $style="background-color: white;border: none;";
+                        }
                         $Nuité=$row['Durée']-1;
                         echo "
                         <tr>
@@ -86,6 +95,7 @@
                             <td>$row[Durée] j</td>
                             <td>$Nuité</td>
                             <td>$row[DateMiss]</td>
+                            <td data-id='$row[IdMiss]'  data-toggle='modal' data-target='#formPJ'><button style='$style'>$PJ</button></td>
                             <td class='action'>
                             <span>
                             <lord-icon src='https://cdn.lordicon.com/dnmvmpfk.json' class='info' trigger='hover' data-toggle='modal' data-target='#infoMiss' colors='primary:#0d6efd' data-id='$row[IdMiss]' style='width:20px;height:20px;margin-top: 5px'></lord-icon>
@@ -188,6 +198,7 @@
             </div>
         </div>
     </div>
+
     <div class="modal fade" id="validerRemb" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered " role="document">
             <div class="modal-content">
@@ -238,7 +249,8 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+
+    <div class="modal fade" id="formAjt" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -479,7 +491,46 @@
         </div>
     </div>
 
-
+    <div class="modal fade" id="formPJ" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalCenterTitle">Modifier la mission</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="../controller.php" method="post" enctype="multipart/form-data">
+                    <div class="modal-body">
+                        <div class="row">
+                            <?php
+                            $row = DataBase::getDataWhere('piècesjointes', 'IdMiss=19');
+                            $nom = $row[0]['NomPJ'];
+                            $id = $row[0]['IdPJ'];
+                            echo "<div class='col mb-3'>
+                                    <input type='hidden' name='IdPJ[]' value='$id'>
+                                    <div class='image-container' onmouseover='showOverlay(this)' onmouseout='hideOverlay(this)'>
+                                        <img src='../PJ/$nom' class='PJ' id='image1'>
+                                        <div class='overlay-content d-none'>
+                                            <input type='file' name='file[]' id='fileInput1' style='display:none' onchange='updateImage(event, \"image1\", \"image1\")' accept='image/*,application/pdf'>
+                                            <label for='fileInput1'><i class='fa fa-pen'></i></label>
+                                        </div>
+                                    </div>
+                                    <div class='caption'>
+                                        <b class='ms-4'>Petit-déjeuner</b>
+                                    </div>
+                                </div>";
+                            ?>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal" style="width: 72px;height: 36px;">Fermer</button>
+                        <button type="submit" name="modifPJ" class="btn btn-primary" style="width: 145px;background-color: #69c1ec !important;border-color: #69c1ec !important;height: 36px;">Valider</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
 <?php
     if(isset($_SESSION['erreur'])){

@@ -465,3 +465,28 @@ function erreur(erreur) {
         timer: 3000,
     });
 }
+
+function showOverlay(element) {
+    element.classList.add('overlay');
+    var overlay = element.querySelector('.overlay-content');
+    overlay.classList.remove('d-none');
+}
+
+function hideOverlay(element) {
+    element.classList.remove('overlay');
+    var overlay = element.querySelector('.overlay-content');
+    overlay.classList.add('d-none');
+}
+
+
+function updateImage(event, imageId) {
+    var fileInput = event.target;
+    if (fileInput.files && fileInput.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            var imageElement = document.getElementById(imageId);
+            imageElement.src = e.target.result;
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+    }
+}

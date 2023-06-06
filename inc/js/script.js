@@ -1,24 +1,3 @@
-const links = document.querySelectorAll('#navbar-list a');
-
-// Parcourir les liens et vérifier si l'URL correspond à la page active
-links.forEach(link => {
-    if (link.href === window.location.href) {
-        link.classList.add('active');
-    }
-});
-$(document).ready(function() {
-    var table = $('#tableMission').DataTable({
-        lengthChange: false,
-        ordering: false,
-        info: false,
-        paging: false,
-    });
-
-    $('#searchInput').on('keyup', function() {
-        var searchText = $(this).val();
-        table.search(searchText).draw();
-    });
-});
 $(document).ready(function() {
     var navbar = document.getElementById('main-navbar');
     var navbarBrand = document.getElementById('navbar-brand');
@@ -31,13 +10,13 @@ $(document).ready(function() {
         sidebar.setAttribute("style", "padding:58px 0 0");
     }
 });
+
 window.addEventListener('resize', function() {
     var navbar = document.getElementById('main-navbar');
     var navbarBrand = document.getElementById('navbar-brand');
     var navbarList = document.getElementById('navbar-list');
     var sidebar = document.getElementById('sidebarMenu');
     var windowWidth = window.innerWidth;
-
     if (windowWidth < 992) {
         navbar.setAttribute("style", "left:0 !important");
         navbarBrand.remove();
@@ -50,24 +29,7 @@ window.addEventListener('resize', function() {
         }
     }
 });
-var button = document.querySelector('.navbar-toggler');
-button.addEventListener('click', function() {
-    // Récupérer l'élément cible du bouton
-    var target = document.querySelector(button.getAttribute('data-bs-target'));
 
-    // Vérifier si l'élément cible est déjà affiché ou masqué
-    var isExpanded = button.getAttribute('aria-expanded') === 'true';
-
-    // Afficher ou masquer l'élément cible en fonction de son état actuel
-    if (isExpanded) {
-        target.classList.remove('show');
-        button.setAttribute('aria-expanded', 'false');
-    } else {
-        target.classList.add('show');
-        button.setAttribute('aria-expanded', 'true');
-        document.getElementsByClassName('navbar').style.left = "0px !important";
-    }
-});
 $(document).on("click", "#lienValiderRemb", function() {
     var IdMiss = $(this).data('id');
     var TypeMiss = $(this).attr('data-TypeMiss');
@@ -75,6 +37,21 @@ $(document).on("click", "#lienValiderRemb", function() {
     $(" .modal-body h5").html("Type de mission : " + TypeMiss);
 
 });
+
+
+$(document).ready(function() {
+    var table = $('#tableMission').DataTable({
+        lengthChange: false,
+        ordering: false,
+        info: false,
+        paging: false,
+    });
+    $('#searchInput').on('keyup', function() {
+        var searchText = $(this).val();
+        table.search(searchText).draw();
+    });
+});
+
 $(document).on("change", "#checkAccomp", function() {
     var Accomp = document.getElementById("Accomp");
     var check = document.getElementById("checkAccomp");
@@ -84,6 +61,7 @@ $(document).on("change", "#checkAccomp", function() {
         Accomp.style.display = 'none';
     }
 });
+
 $(document).ready(function() {
     $('.icnModifMiss').click(function() {
         var IdMiss = $(this).data('id');
@@ -126,6 +104,7 @@ $(document).ready(function() {
         });
     });
 });
+
 $(document).ready(function() {
     $('.info').click(function() {
         var IdMiss = $(this).data('id');
@@ -154,6 +133,7 @@ $(document).ready(function() {
         });
     });
 });
+
 $(document).ready(function() {
     $('.infoCollab').click(function() {
         var IdMb = $(this).data('id');
@@ -176,6 +156,7 @@ $(document).ready(function() {
         });
     });
 });
+
 $(document).ready(function() {
     $('.collabMiss').click(function() {
         var IdMb = $(this).data('id');
@@ -200,6 +181,7 @@ $(document).ready(function() {
         });
     });
 });
+
 $(document).ready(function() {
     $('.icnModifCollab').click(function() {
         var IdMb = $(this).data('id');
@@ -228,6 +210,7 @@ $(document).ready(function() {
         });
     });
 });
+
 $(document).ready(function() {
     $('.icnModifGroupe').click(function() {
         var IdG = $(this).data('id');
@@ -247,6 +230,7 @@ $(document).ready(function() {
         });
     });
 });
+
 $(document).ready(function() {
     $('.icnModifFrais').click(function() {
         var IdFrais = $(this).data('id');
@@ -313,4 +297,59 @@ $(function() {
         dateFormat: 'dd-mm-yy',
         firstDay: '1',
     });
+});
+var button = document.querySelector('.navbar-toggler');
+button.addEventListener('click', function() {
+    // Récupérer l'élément cible du bouton
+    var target = document.querySelector(button.getAttribute('data-bs-target'));
+
+    // Vérifier si l'élément cible est déjà affiché ou masqué
+    var isExpanded = button.getAttribute('aria-expanded') === 'true';
+
+    // Afficher ou masquer l'élément cible en fonction de son état actuel
+    if (isExpanded) {
+        target.classList.remove('show');
+        button.setAttribute('aria-expanded', 'false');
+    } else {
+        target.classList.add('show');
+        button.setAttribute('aria-expanded', 'true');
+        document.getElementsByClassName('navbar').style.left = "0px !important";
+    }
+});
+const links = document.querySelectorAll('#navbar-list a');
+// Parcourir les liens et vérifier si l'URL correspond à la page active
+links.forEach(link => {
+    if (link.href === window.location.href) {
+        link.classList.add('active');
+    }
+});
+var editIcons = document.querySelectorAll('.edit');
+var buttons = document.getElementById('buttons');
+var input = document.querySelectorAll('.inpt-txt');
+// Parcourir toutes les icônes de modification
+editIcons.forEach(function(icon) {
+    // Ajouter un écouteur d'événement de clic à chaque icône de modification
+    icon.addEventListener('click', function() {
+        // Récupérer l'élément parent de l'icône de modification
+        var parentRow = icon.parentNode;
+
+        // Récupérer l'élément input dans la même ligne que l'icône de modification
+        var inputElement = parentRow.querySelector('input[type="text"]');
+
+        // Rendre la bordure de l'input visible
+        inputElement.style.border = '1px solid gray';
+        inputElement.removeAttribute('readonly');
+        // Rendre l'icône de validation visible
+        buttons.classList.remove('d-none');
+    });
+});
+
+var btnAnn = document.getElementById('btn-annuler');
+btnAnn.addEventListener('click', function() {
+    input.forEach(function(input) {
+        input.style.border = 'none';
+        input.setAttribute('readonly', '');
+        buttons.classList.add("d-none");
+    })
+
 });

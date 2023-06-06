@@ -1,6 +1,6 @@
 <?php
 
-use Tets\Oop\DataBase;
+    use Tets\Oop\DataBase;
 
     require "../vendor/autoload.php";
     include "./inc/header.php";
@@ -42,7 +42,7 @@ use Tets\Oop\DataBase;
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
                         <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                            Nombre de missions</div>
+                            Missions</div>
                         <div class="h5 mb-0 font-weight-bold gray"><?=$rslt1?></div>
                     </div>
                     <div class="col-auto gray">
@@ -147,6 +147,7 @@ use Tets\Oop\DataBase;
         </div>
     </div>
 </div>
+
 <?php 
     $row = DataBase::getDataWhere('missions','DeletedAt is null');
 
@@ -196,7 +197,7 @@ use Tets\Oop\DataBase;
             datasets: [{
                 label: "Missions effectuées",
                 data: missionsByMonth,
-                backgroundColor: "#1e8af7"
+                backgroundColor: "#8ec6ff"
             }]
         }
     });
@@ -253,7 +254,7 @@ use Tets\Oop\DataBase;
             datasets: [{
                 label: "Missions effectuées",
                 data :missionCounts,
-                backgroundColor: "#1e8af7"
+                backgroundColor: "#8ec6ff"
             }]
         }
     });
@@ -309,7 +310,7 @@ use Tets\Oop\DataBase;
             datasets: [{
                 label: "Missions effectuées",
                 data: missionGCounts,
-                backgroundColor: "#1e8af7"
+                backgroundColor: "#8ec6ff"
             }]
         }
     });
@@ -366,7 +367,7 @@ use Tets\Oop\DataBase;
             datasets: [{
                 label: "Montants remboursés en DHS",
                 data: remboursementAmounts,
-                backgroundColor: "#1e8af7"
+                backgroundColor: "#8ec6ff"
             }]
         }
     });

@@ -70,7 +70,7 @@
                             <td>$row[TauxG]</td>
                             <td class='action'>
                                 <span>
-                                    <i class='fa-solid fa-pen icnModifGroupe'  data-toggle='modal' data-target='#validerRemb' data-id='$row[IdG]' style='color: orange;font-size: 19px;'></i>
+                                    <i class='fa-solid fa-pen icnModifGroupe'  data-toggle='modal' data-target='#modifGroupe' data-id='$row[IdG]' style='color: orange;font-size: 19px;'></i>
                                 </span>
                                 <span>
                                     <i class='fa-solid fa-trash fa-2x' style='color: #e82626;font-size: 20px !important' onclick=\"confirmSupp('groupes',$row[IdG],$page)\"></i>
@@ -179,56 +179,7 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="validerRemb" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered " role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Valider le remboursement</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form action="../controller.php?page=1" method="post" enctype="multipart/form-data" onsubmit="return vérifRemb()">
-                        <h5 style="color: #5a5a5a">Type de mission :</h5><hr style="width: 663px;margin-left: 0px !important;">
-                            <input type="hidden" name="IdMiss" id="IdMissRemb">
-                            <div class="row g-3 mb-3">
-                                <div class="col">
-                                    <label for="montant">Montant en DHS </label>
-                                    <input type="number" id="Montant" name="Remb" class="form-control" placeholder="Montant à rembourser">
-                                </div>
-                                <div class="col">
-                                    <label for="Paiement">Mode de paiement</label>
-                                    <select class="form-select" id="Paiement" name="Paiement">
-                                    <option value="">Choisir</option>
-                                        <?php 
-                                            $row=DataBase::getData('paiement');
-                                            foreach($row as $row){
-                                                echo "<option value='$row[IdPaiement]'>$row[TypePaiement]</option>";
-                                            }
-                                        ?>
-                                    </select>
-                                </div>
-                            </div>
-                            <div style="align-items: center;display: flex;" onclick="addFile()">
-                                <span>
-                                    <i class="fa-solid fa-square-plus fa-2x" id="addF" style="margin-top: 10px;margin-bottom: 10px;color: gray;"></i>
-                                </span>
-                                <span style="margin-left: 10px;">
-                                    Ajouter une pièce jointe
-                                </span>
-                            </div>
-                            <div id="addFile" style="height: auto;overflow-y: auto;overflow-x: hidden;max-height: 158px;">
-                            </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal" style="width: 72px;height: 36px;">Fermer</button>
-                    <button type="submit" name="validerRemb" class="btn btn-primary" style="width: 145px;height: 36px;" onclick='document.getElementById("montant-rembourser").enabled="enabled";'>Enregistrer</button>
-                </div>
-                </form>
-            </div>
-        </div>
-    </div>
+   
 
 <?php
     if(isset($_SESSION['erreur'])){

@@ -1,6 +1,8 @@
 body {
     overflow-x: hidden;
     background-color: #fbfbfb;
+    font-family: poppins !important;
+    color: #5a5a5a!important;
 }
 
 @media (min-width: 991.98px) {
@@ -17,6 +19,10 @@ body {
 .navbar-brand {
     margin-left: 47px;
     margin-bottom: 41px;
+}
+
+.datepicker {
+    top: 110.5px !important;
 }
 
 
@@ -49,7 +55,7 @@ body {
 .sidebar .active {
     color: #58baeb !important;
     background-color: white !important;
-    border-radius: 5px;
+    border-radius: 5px !important;
     /*box-shadow: 0 2px 5px 0 #58baeb, 0 2px 10px 0 #58baeb;*/
     border: none !important;
 }
@@ -211,4 +217,101 @@ table td.action input {
 
 .greenText {
     color: #3ec93e !important;
+}
+
+.inpt-txt {
+    border: none;
+    padding: 4px;
+    border-radius: 3px;
+    color: rgb(69, 87, 106) !important;
+    outline: none !important;
+}
+
+.sec-histo {
+    height: 50px;
+    background-color: inherit;
+    text-align: center;
+    font-size: 13px;
+    color: rgb(69, 87, 106);
+    border: 1px solid rgb(235 235 235);
+    border-radius: 4px;
+    padding: 12px 0px;
+}
+
+.overlay {
+    position: relative;
+    display: inline-block;
+}
+
+.overlay::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgb(0 0 0 / 66%);
+    z-index: 3;
+}
+
+.overlay-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 24px;
+    z-index: 4;
+}
+
+.overlay-container {
+    position: relative;
+}
+
+.caption {
+    position: absolute;
+    /* bottom: 0; */
+    /* left: 0; */
+    width: 100%;
+    /* color: white; */
+    padding: 8px;
+}
+
+.image-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    overflow: hidden;
+}
+
+.image-iframe>img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.PJ {
+    border: 1px solid #dbdbdb;
+    width: 147px;
+    position: relative;
+    z-index: 2;
+}
+
+::-webkit-scrollbar {
+    width: 20px;
+}
+
+::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #d6dee1;
+    border-radius: 20px;
+    border: 6px solid transparent;
+    background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #a8bbbf;
 }
