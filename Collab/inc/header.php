@@ -1,4 +1,12 @@
-<?php session_start()?>
+<?php 
+    session_start();
+    use Tets\Oop\Membre;
+    require "../vendor/autoload.php";
+    if(!Membre::Collab()){
+      header("location:../index.php");
+    }
+
+?>
 <!doctype html>
 <html lang="en">
 <head>
@@ -11,7 +19,6 @@
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="../inc/js/jsBoot/bootstrap.min.js" ></script>
     <script src="https://cdn.lordicon.com/ritcuqlt.js"></script>
-    <link rel="stylesheet" href="../node_modules/font-awesome/css/font-awesome.min.css">
     <script src="https://kit.fontawesome.com/9f23a76265.js" crossorigin="anonymous"></script>
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
@@ -29,16 +36,14 @@
 <body>
   <header>
     <!-- Navbar -->
-    <nav id="main-navbar" class="navbar navbar-expand-lg navbar-light bg-white fixed-top" style="left: 0 !important;">
-      <a id="navbar-brand" class="navbar-brand" href="index.html" style="padding: 0px 0px !important;margin-bottom: 0px !important;margin-left: 20px !important;">
+    <nav  class="navbar navbar-expand-lg navbar-light bg-white fixed-top" style="left: 0 !important;">
+    <div class="container-fluid">
+
+      <a  class="navbar-brand navbar-collab" href="index.html">
           <img src="../inc/img/logoB.svg" alt="" loading="lazy" style="width:75px">
       </a>
       <!-- Container wrapper -->
-      <div class="container-fluid">
         <!-- Toggle button -->
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
-          <i class="fas fa-bars" aria-hidden="true"></i>
-        </button>
 
         <!-- Right links -->
         <ul class="navbar-nav ms-auto d-flex flex-row">
@@ -49,7 +54,7 @@
               Bonjour <?= $_SESSION['membre']['Prénom'] ?>
             </a>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
-              <li><a class="dropdown-item" href="#">Profil</a></li>
+              <li><a class="dropdown-item" href="./profil.php">Profil</a></li>
               <li><a class="dropdown-item" href="../controller.php?décon">Déconnexion</a></li>
             </ul>
           </li>

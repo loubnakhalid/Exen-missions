@@ -1,8 +1,8 @@
 <?php
     use Tets\Oop\DataBase;
-    require "../vendor/autoload.php";
     include "./inc/header.php";
-    $con=\Tets\Oop\DataBase::connect();
+    //Nombre de pages et elements par pages
+    $con=DataBase::connect();
     if(isset($_GET['search'])){
         $count=$con->query("select count(IdMiss) as cpt from missions natural join membres where DeletedAt is null and (RéfMiss like '%$_GET[search]%' or Nom like '%$_GET[search]%' or Prénom like '%$_GET[search]%' or LieuDép like '%$_GET[search]%' or ObjMiss like '%$_GET[search]%') ");
     }
@@ -32,19 +32,19 @@
     }
     $row=$rslt->fetchAll();
 ?>
-
+    <!--Liste des missions-->
     <div class="card">
         <div class="card-header">
             <h4>Liste des missions</h4>
             <div class="entete">
                 <div class="search-add">
-                    <form class="d-flex" style="/* margin-top: 37px; */margin-right: 14px;" action="missions.php" method="get">
-                        <input class="form-control me-sm-2" type="search" id="searchInput" name="search" placeholder="Search" style="margin-right: -55px!important;border-radius: 11px;height: 41px;">
-                        <button class="btn btn-secondary my-2 my-sm-0" type="submit" style="width: 53px;height: 29px;margin-top: 5px !important;margin-right: 3px;background-color: white !important;border: none !important;color: gray !important;">
+                    <form class="d-flex" style="margin-right: 14px;" action="missions.php" method="get">
+                        <input class="form-control me-sm-2 inptSearch" type="search" id="searchInput" name="search" placeholder="Rechercher" style="margin-right: -55px !important;">
+                        <button class="btn btn-secondary my-2 my-sm-0 subSearch" type="submit" style="margin-top: 5px !important;">
                             <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
                         </button>
                     </form>
-                    <button type="button" class="btn btn-lg btn-primary" style="width: 177px;padding: 5px 2px;height: 38px;font-size: 17px;" data-toggle="modal" data-target="#formAjt">+ Ajouter mission</button>
+                    <button type="button" class="btn btn-lg btn-primary btnAjt" data-toggle="modal" data-target="#formAjt">+ Ajouter mission</button>
                 </div>
             </div>
         </div>
@@ -75,11 +75,10 @@
                         $rsltPJ=$con->query("select * from piècesjointes where IdMiss=$row[IdMiss]");
                         if($rsltPJ->rowCount()!=0){
                             $PJ=$rsltPJ->rowCount();
-                            $style="text-decoration:underline;background-color: white;border: none;color:blue";
+                            $btnPJ="<button data-id='$row[IdMiss]' data-toggle='modal' data-target='#formPJ' class='btnPJ'>$PJ</button>";
                         }
                         else{
-                            $PJ='-';
-                            $style="background-color: white;border: none;";
+                            $btnPJ='-';
                         }
                         $Nuité=$row['Durée']-1;
                         echo "
@@ -95,77 +94,68 @@
                             <td>$row[Durée] j</td>
                             <td>$Nuité</td>
                             <td>$row[DateMiss]</td>
-                            <td data-id='$row[IdMiss]'  data-toggle='modal' data-target='#formPJ'><button style='$style'>$PJ</button></td>
+                            <td>$btnPJ</td>
                             <td class='action'>
-                            <span>
-                            <lord-icon src='https://cdn.lordicon.com/dnmvmpfk.json' class='info' trigger='hover' data-toggle='modal' data-target='#infoMiss' colors='primary:#0d6efd' data-id='$row[IdMiss]' style='width:20px;height:20px;margin-top: 5px'></lord-icon>
-                            </span>
+                                <span>
+                                    <lord-icon src='https://cdn.lordicon.com/dnmvmpfk.json' class='info' trigger='hover' data-toggle='modal' data-target='#infoMiss' colors='primary:#0d6efd' data-id='$row[IdMiss]'></lord-icon>
+                                </span>
                             ";
                             
-                if($row['StatutMiss']==1 && $row['Montant']!=NULL){
-                    echo "
-                        <span class='dropdown'>
-                            <button class='btn btn-secondary btn-sm dropdown-toggle green disabled' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
-                                    <i class='fa-sharp fa-regular fa-circle-check'></i>
-                            </button>
-                        </span>
-                    ";
-                }
-                else{
-                    if($row['StatutMiss']==0){
-                        echo "
-                        <span class='dropdown'>
-                            <button class='btn btn-secondary btn-sm dropdown-toggle red' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
-                                <i class='fa-sharp fa-regular fa-circle-check'></i>
-                            </button>
-                            <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
-                                <input type='hidden' value='$row[TypeMiss]' id='TypeMiss'>
-                                <a class='dropdown-item icnModifMiss'  data-target='#formModif' data-toggle='modal' data-id='$row[IdMiss]'>Modifier la mission</a>
-                                <a class='dropdown-item' href='../controller.php?validerMiss&IdMiss=$row[IdMiss]&page=$page'>Valider la mission</a>
-                                <a class='dropdown-item disabled' href='javascript:void(0)'>Valider le remboursement</a>
-                        ";
-                    }
-                    else{
-                        echo "  
-                        <span class='dropdown'>
-                            <button class='btn btn-secondary btn-sm dropdown-toggle green' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
-                                <i class='fa-sharp fa-regular fa-circle-check'></i>
-                            </button>
-                            <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
-                                <input type='hidden' value='$row[TypeMiss]' id='TypeMiss'>
-                                <a class='dropdown-item disabled' href='javascript:void(0)'>Modifier la mission</a>
-                                <a class='dropdown-item disabled' href='javascript:void(0)'>Valider la mission</a>
-                            ";
-                        if($row['Montant']==NULL){
-                            echo "<a class='dropdown-item' id='lienValiderRemb' data-TypeMiss='$row[TypeMiss]' data-id='$row[IdMiss]' data-toggle='modal' data-target='#validerRemb'>Valider le remboursement</a>";
-                        }
-                        else{
-                            echo "<a class='dropdown-item disabled' href='javascript:void(0)'>Valider le remboursement</a>";
-                        }
-                    }
-                }
-                echo"
-                            </div>
-                        </span>
-                        <span class='dropdown'>
-                        <i class='bx bx-dots-vertical-rounded' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'></i>
-                        <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
-                            <a class='dropdown-item' href='../PDF/Ordre_Mission/$row[OrdreMiss]' target='_blank'>Ordre de mission</a>";
-                            if($row['Montant']!=NULL){
-                            echo "  
-                            <a class='dropdown-item' href='../PDF/Demande_Remboursement/$row[DemandeRemb]' target='_blank'>Demande de remboursement</a>";
+                            if($row['StatutMiss']==1 && $row['Montant']!=NULL){
+                                $class="btn btn-secondary btn-sm dropdown-toggle green disabled";
+                                $modifClass="dropdown-item icnModifMiss disabled";
+                                $validClass="dropdown-item disabled";
+                                $validRembClass="dropdown-item disabled";
+                                $ordreClass="dropdown-item";
+                                $demandeRembClass="dropdown-item";
+                            }
+                            elseif($row['StatutMiss']==0){
+                                $class="btn btn-secondary btn-sm dropdown-toggle red";
+                                $modifClass="dropdown-item icnModifMiss";
+                                $validClass="dropdown-item";
+                                $validRembClass="dropdown-item disabled";
+                                $ordreClass="dropdown-item disabled";
+                                $demandeRembClass="dropdown-item disabled";
                             }
                             else{
-                                echo "  <a class='dropdown-item disabled'>Demande de remboursement</a>";
+                                $class="btn btn-secondary btn-sm dropdown-toggle green";
+                                $modifClass="dropdown-item disabled";
+                                $validClass="dropdown-item disabled";
+                                if($row['Montant']==NULL){
+                                    $validRembClass="dropdown-item";
+                                    $demandeRembClass="dropdown-item disabled";
+                                }
+                                else{
+                                    $validRembClass="dropdown-item disabled";
+                                    $demandeRembClass="dropdown-item";
+                                }
+                                $ordreClass="dropdown-item";
                             }
-                                echo"
-                                <a class='dropdown-item' onclick='document.location.href=\"../controller.php?archMiss&IdMiss=$row[IdMiss]&page=$page\"'>Archiver</a>
-                            </div>
-                        </span>
+                            echo "
+                                <span class='dropdown'>
+                                    <button class='$class' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
+                                        <i class='fa-sharp fa-regular fa-circle-check'></i>
+                                    </button>
+                                    <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
+                                        <input type='hidden' value='$row[TypeMiss]' id='TypeMiss'>
+                                        <a class='$modifClass' data-target='#formModif' data-toggle='modal' data-id='$row[IdMiss]'>Modifier la mission</a>
+                                        <a class='$validClass' href='../controller.php?validerMiss&IdMiss=$row[IdMiss]&page=$page'>Valider la mission</a>
+                                        <a class='$validRembClass' id='lienValiderRemb' data-TypeMiss='$row[TypeMiss]' data-id='$row[IdMiss]' data-toggle='modal' data-target='#validerRemb'>Valider le remboursement</a>
+                                    </div>
+                                </span>
+                                <span class='dropdown'>
+                                    <i class='bx bx-dots-vertical-rounded' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'></i>
+                                    <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
+                                        <a class='$ordreClass' href='../PDF/Ordre_Mission/$row[OrdreMiss]' target='_blank'>Ordre de mission</a>
+                                        <a class='$demandeRembClass' href='../PDF/Demande_Remboursement/$row[DemandeRemb]' target='_blank'>Demande de remboursement</a>
+                                        <a class='dropdown-item' onclick='document.location.href=\"../controller.php?archMiss&IdMiss=$row[IdMiss]&page=$page\"'>Archiver</a>
+                                    </div>
+                                </span>
                             </td>
-                        </tr>";
-                    }
-                    ?>
+                        </tr>
+                        ";
+                        }
+                        ?>
                     </tbody>
                 </table>
             </div>
@@ -198,58 +188,7 @@
             </div>
         </div>
     </div>
-
-    <div class="modal fade" id="validerRemb" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered " role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Valider le remboursement</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form action="../controller.php?page=1" method="post" enctype="multipart/form-data" onsubmit="return vérifRemb()">
-                        <h5 style="color: #5a5a5a">Type de mission :</h5><hr style="width: 663px;margin-left: 0px !important;"/>
-                            <input type="hidden" name="IdMiss" id="IdMissRemb">
-                            <div class="row g-3 mb-3">
-                                <div class="col">
-                                    <label for="montant">Montant en DHS </label>
-                                    <input type="number" id="Montant" name="Remb" class="form-control" placeholder="Montant à rembourser">
-                                </div>
-                                <div class="col">
-                                    <label for="Paiement">Mode de paiement</label>
-                                    <select class="form-select" id="Paiement" name="Paiement">
-                                    <option value="">Choisir</option>
-                                        <?php 
-                                            $row=DataBase::getData('paiement');
-                                            foreach($row as $row){
-                                                echo "<option value='$row[IdPaiement]'>$row[TypePaiement]</option>";
-                                            }
-                                        ?>
-                                    </select>
-                                </div>
-                            </div>
-                            <div style="align-items: center;display: flex;" onclick="addFile()">
-                                <span>
-                                    <i class="fa-solid fa-square-plus fa-2x" id="addF" style="margin-top: 10px;margin-bottom: 10px;color: gray;"></i>
-                                </span>
-                                <span style="margin-left: 10px;">
-                                    Ajouter une pièce jointe
-                                </span>
-                            </div>
-                            <div id="addFile" style="height: auto;overflow-y: auto;overflow-x: hidden;max-height: 158px;">
-                            </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal" style="width: 72px;height: 36px;">Fermer</button>
-                    <button type="submit" name="validerRemb" class="btn btn-primary" style="width: 145px;height: 36px;" onclick='document.getElementById("montant-rembourser").enabled="enabled";'>Enregistrer</button>
-                </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
+    <!--Formulaire d'ajout d'une mission-->
     <div class="modal fade" id="formAjt" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
@@ -263,7 +202,7 @@
                     <div class="modal-body">
                         <div class="row-collab">
                             <label>Collaborateur pour la mission :</label>
-                            <select name="IdCollab" class="form-select" id="collaborateur">
+                            <select name="IdCollab" class="form-select mt-1" id="collaborateur">
                                 <option value="">Collaborateur</option>
                                 <?php
                                 $row=\Tets\Oop\DataBase::getDataWhere('membres','Statut=0');
@@ -276,32 +215,32 @@
                         <div class="row g-3 mb-3" style="margin-top: 15px">
                             <div class="col">
                                 <label>Objet de la mission</label>
-                                <input type="text" name="ObjMiss" id="ObjMiss" placeholder="Objet de la mission" class="form-control">
+                                <input type="text" name="ObjMiss" id="ObjMiss" placeholder="Objet de la mission" class="form-control mt-1">
                             </div>
                             <div class="col">
                                 <label>Lieu de déplacement</label>
-                                <input type="text" name="LieuDép" id="LieuDép" placeholder="Lieu de déplacement" class="form-control">
+                                <input type="text" name="LieuDép" id="LieuDép" placeholder="Lieu de déplacement" class="form-control mt-1">
                             </div>
                             <div class="col">
                                 <label>Moyen de transport</label>
-                                <input type="text" name="MoyTrans" placeholder="Moyen de transport" class="form-control">
+                                <input type="text" name="MoyTrans" placeholder="Moyen de transport" class="form-control mt-1">
                             </div>
                         </div>
                         <div class="row mb-3" style="margin-top: 15px;">
                             <div class="col-xl col-lg">
                                 <label>Date de départ</label>
-                                <input type="text" name="Départ" id="Départ" placeholder="Date de départ" class="form-control" autocomplete="false">
+                                <input type="text" id="Départ" name="Départ" placeholder="Date de départ" class="form-control mt-1 Départ" autocomplete="false">
                             </div>
                             <div class="col-xl col-lg">
                                 <label>Date de retour</label>
-                                <input type="text" name="Retour" id="Retour" placeholder="Date de retour" class="form-control">
+                                <input type="text" id="Retour" name="Retour"  placeholder="Date de retour" class="form-control mt-1 Retour">
                             </div>
                             <div class="col-xl col-lg">
                                 <label>Type mission</label>
-                                <select type="text" name="TypeMiss" id="TypeMission" class="form-select">
+                                <select type="text" name="TypeMiss" id="TypeMission" class="form-select mt-1">
                                     <option value="">Choisir</option>
-                                    <option value="Journaliere">Journaliere</option>
-                                    <option value="Mensuel">Mensuel</option>
+                                    <option value="Journalière">Journalière</option>
+                                    <option value="Mensuelle">Mensuelle</option>
                                 </select>
                             </div>
                         </div>
@@ -309,13 +248,13 @@
                             <div class="col-xl col-lg border-light">
                                 <div class="form-check">
                                     <input type="hidden" value="0" name="accompagnateur">
-                                    <input name="accompagnateur" class="form-check-input" type="checkbox" value="1" id="checkAccomp">
+                                    <input name="accompagnateur" class="form-check-input mt-1" type="checkbox" value="1" id="checkAccomp">
                                     <label class="form-check-label" for="checkAccomp">Accompagnateur</label>
                                 </div>
                             </div>
                             <div class="col-xl col-lg nom_accompagnateur" id="Accomp" style="display: none;">
                                 <label for="nomAccomp">Accompagnateur</label>
-                                <input type="text" class="form-control" name="Accomp" id="nomAccomp" placeholder="Nom de l'accompagnateur">
+                                <input type="text" class="form-control mt-1" name="Accomp" id="nomAccomp" placeholder="Nom de l'accompagnateur">
                             </div>
                         </div>
                         <div class="row">
@@ -333,7 +272,83 @@
             </div>
         </div>
     </div>
+    <!--Formulaire de modification d'une mission-->
+    <div class="modal fade" id="formModif" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalCenterTitle">Modifier la mission</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="modifMiss" action="../controller.php?page=<?=$page?>" method="POST" onsubmit="return vérifModifMiss()">
+                    <input type="hidden" name="IdMiss" id="IdMiss">
+                    <div class="modal-body">
+                        <div class="row g-3 mb-3">
+                            <div class="col">
+                                <label>Collaborateur pour la mission :</label>
+                                <select name="IdMb" class="form-select mt-1" id="collaborateurModif">
+                                    <option value="">Collaborateur</option>
+                                    <?php
+                                    $row2=\Tets\Oop\DataBase::getDataWhere('membres','Statut=0');
+                                    foreach ($row2 as $row2){
+                                        echo "<option value='$row2[IdMb]'>$row2[Nom] $row2[Prénom]</option>";
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+                            <div class="col">
+                                <label for="nom_accompagnateur">Accompagnateur</label>
+                                <input type="text" name="Accomp" class="form-control mt-1" id="AccompModif" placeholder="Nom de l'accompagnateur">
+                            </div>
+                        </div>
+                        <div class="row g-3 mb-3" style="margin-top: 15px">
+                            <div class="col">
+                                <label>Objet de la mission</label>
+                                <input type="text" name="ObjMiss" id="ObjMissModif" placeholder="Objet de la mission" class="form-control mt-1">
+                            </div>
+                            <div class="col">
+                                <label>Lieu de déplacement</label>
+                                <input type="text" name="LieuDép" id="LieuDépModif"  placeholder="Lieu de déplacement" class="form-control mt-1">
+                            </div>
+                            <div class="col">
+                                <label>Moyen de transport</label>
+                                <input type="text" name="MoyTrans" id="MoyTransModif"  placeholder="Moyen de transport" class="form-control mt-1">
+                            </div>
+                        </div>
+                        <div class="row mb-3" style="margin-top: 15px;">
+                            <div class="col-xl col-lg">
+                                <label>Date de départ</label>
+                                <input type="text" name="Départ" id="DépartModif"  placeholder="Date de départ" class="form-control Départ mt-1">
+                            </div>
+                            <div class="col-xl col-lg">
+                                <label>Date de retour</label>
+                                <input type="text" name="Retour" id="RetourModif"  placeholder="Date de retour" class="form-control Retour mt-1">
+                            </div>
+                            <div class="col-xl col-lg">
+                                <label>Type mission</label>
+                                <select type="text" name="TypeMiss" id="TypeMissModif" class="form-select mt-1">
 
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xl col-lg">
+                                <label for="desc" class="form-label">Description :</label>
+                                <textarea name="Note" id="NoteModif" class="form-control" id="desc" cols="30" rows="3" placeholder="Donner une petite description de la mission .." data-gramm="false" wt-ignore-input="true" data-quillbot-element="3D-A0C1vd6eH8sNXr1bQQ"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal" style="width: 72px;height: 36px;" onclick="history.back()">Fermer</button>
+                        <button type="submit" name="modifMiss" class="btn btn-primary" style="width: 145px;background-color: #69c1ec !important;border-color: #69c1ec !important;height: 36px;">Modifier</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Formulaire des information d'une mission-->
     <div class="modal fade" id="infoMiss" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true"> 
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content ">
@@ -409,137 +424,94 @@
 
                             </td>
                         </tr>
+                        <tr class="trInfoMontant">
+                            <td>
+                                Montant :
+                            </td>
+                            <td id="infoMontant">
+
+                            </td>
+                        </tr>
                     </table>
                 </div>
             </div>
         </div>
     </div>
-
-    <div class="modal fade" id="formModif" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
+    <!--Formulaire de validation de remboursement d'une mission-->
+    <div class="modal fade" id="validerRemb" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered " role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalCenterTitle">Modifier la mission</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Valider le remboursement</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form id="modifMiss" action="../controller.php?page=<?=$page?>" method="POST" onsubmit="return vérifModifMiss()">
-                    <input type="hidden" name="IdMiss" id="IdMiss">
-                    <div class="modal-body">
-                        <div class="row g-3 mb-3">
-                            <div class="col">
-                                <label>Collaborateur pour la mission :</label>
-                                <select name="IdMb" class="form-select" id="collaborateurModif">
-                                    <option value="">Collaborateur</option>
-                                    <?php
-                                    $row2=\Tets\Oop\DataBase::getDataWhere('membres','Statut=0');
-                                    foreach ($row2 as $row2){
-                                        echo "<option value='$row2[IdMb]'>$row2[Nom] $row2[Prénom]</option>";
-                                    }
-                                    ?>
-                                </select>
+                <div class="modal-body">
+                    <form action="../controller.php?page=1" method="post" enctype="multipart/form-data" onsubmit="return vérifRemb()">
+                        <h6 style="color: #5a5a5a">Type de mission :</h6><hr style="width: 663px;margin-left: 0px !important;"/>
+                            <input type="hidden" name="IdMiss" id="IdMissRemb">
+                            <div class="row g-3 mb-3">
+                                <div class="col">
+                                    <label for="montant">Montant en DHS </label>
+                                    <input type="number" id="Montant" name="Remb" class="form-control" placeholder="Montant à rembourser">
+                                </div>
+                                <div class="col">
+                                    <label for="Paiement">Mode de paiement</label>
+                                    <select class="form-select" id="Paiement" name="Paiement">
+                                    <option value="">Choisir</option>
+                                        <?php 
+                                            $row=DataBase::getData('paiement');
+                                            foreach($row as $row){
+                                                echo "<option value='$row[IdPaiement]'>$row[TypePaiement]</option>";
+                                            }
+                                        ?>
+                                    </select>
+                                </div>
                             </div>
-                            <div class="col">
-                                <label for="nom_accompagnateur">Accompagnateur</label>
-                                <input type="text" name="Accomp" class="form-control" id="AccompModif" placeholder="Nom de l'accompagnateur">
+                            <div style="align-items: center;display: flex;" onclick="addFile()">
+                                <span>
+                                    <i class="fa-solid fa-square-plus fa-2x" id="addF" style="margin-top: 10px;margin-bottom: 10px;color: gray;"></i>
+                                </span>
+                                <span style="margin-left: 10px;">
+                                    Ajouter une pièce jointe
+                                </span>
                             </div>
-                        </div>
-                        <div class="row g-3 mb-3" style="margin-top: 15px">
-                            <div class="col">
-                                <label>Objet de la mission</label>
-                                <input type="text" name="ObjMiss" id="ObjMissModif" placeholder="Objet de la mission" class="form-control">
+                            <div id="addFile" style="height: auto;overflow-y: auto;overflow-x: hidden;max-height: 158px;">
+                                            
                             </div>
-                            <div class="col">
-                                <label>Lieu de déplacement</label>
-                                <input type="text" name="LieuDép" id="LieuDépModif"  placeholder="Lieu de déplacement" class="form-control">
-                            </div>
-                            <div class="col">
-                                <label>Moyen de transport</label>
-                                <input type="text" name="MoyTrans" id="MoyTransModif"  placeholder="Moyen de transport" class="form-control">
-                            </div>
-                        </div>
-                        <div class="row mb-3" style="margin-top: 15px;">
-                            <div class="col-xl col-lg">
-                                <label>Date de départ</label>
-                                <input type="text" name="Départ" id="DépartModif"  placeholder="Date de départ" class="form-control">
-                            </div>
-                            <div class="col-xl col-lg">
-                                <label>Date de retour</label>
-                                <input type="text" name="Retour" id="RetourModif"  placeholder="Date de retour" class="form-control">
-                            </div>
-                            <div class="col-xl col-lg">
-                                <label>Type mission</label>
-                                <select type="text" name="TypeMiss" id="TypeMissModif" class="form-select">
-
-                                </select>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-xl col-lg">
-                                <label for="desc" class="form-label">Description :</label>
-                                <textarea name="Note" id="NoteModif" class="form-control" id="desc" cols="30" rows="3" placeholder="Donner une petite description de la mission .." data-gramm="false" wt-ignore-input="true" data-quillbot-element="3D-A0C1vd6eH8sNXr1bQQ"></textarea>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal" style="width: 72px;height: 36px;" onclick="history.back()">Fermer</button>
-                        <button type="submit" name="modifMiss" class="btn btn-primary" style="width: 145px;background-color: #69c1ec !important;border-color: #69c1ec !important;height: 36px;">Modifier</button>
-                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" style="width: 72px;height: 36px;">Fermer</button>
+                    <button type="submit" name="validerRemb" class="btn btn-primary" style="width: 145px;height: 36px;" onclick='document.getElementById("montant-rembourser").enabled="enabled";'>Enregistrer</button>
+                </div>
                 </form>
             </div>
         </div>
     </div>
-
+    <!--Formulaire des pièces jointes d'une mission-->
     <div class="modal fade" id="formPJ" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalCenterTitle">Modifier la mission</h5>
+                    <h5 class="modal-title" id="exampleModalCenterTitle">Pièces jointes</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form action="../controller.php" method="post" enctype="multipart/form-data">
+                <!--<form action="../controller.php" method="post" enctype="multipart/form-data">-->
                     <div class="modal-body">
-                        <div class="row">
-                            <?php
-                            $row = DataBase::getDataWhere('piècesjointes', 'IdMiss=19');
-                            $nom = $row[0]['NomPJ'];
-                            $id = $row[0]['IdPJ'];
-                            echo "<div class='col mb-3'>
-                                    <input type='hidden' name='IdPJ[]' value='$id'>
-                                    <div class='image-container' onmouseover='showOverlay(this)' onmouseout='hideOverlay(this)'>
-                                        <img src='../PJ/$nom' class='PJ' id='image1'>
-                                        <div class='overlay-content d-none'>
-                                            <input type='file' name='file[]' id='fileInput1' style='display:none' onchange='updateImage(event, \"image1\", \"image1\")' accept='image/*,application/pdf'>
-                                            <label for='fileInput1'><i class='fa fa-pen'></i></label>
-                                        </div>
-                                    </div>
-                                    <div class='caption'>
-                                        <b class='ms-4'>Petit-déjeuner</b>
-                                    </div>
-                                </div>";
-                            ?>
+                        <div class="row" id="rowMissPJ">
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal" style="width: 72px;height: 36px;">Fermer</button>
-                        <button type="submit" name="modifPJ" class="btn btn-primary" style="width: 145px;background-color: #69c1ec !important;border-color: #69c1ec !important;height: 36px;">Valider</button>
                     </div>
-                </form>
+                <!--</form>-->
             </div>
         </div>
     </div>
 
 <?php
-    if(isset($_SESSION['erreur'])){
-        echo "<script>erreur(\"$_SESSION[erreur]\");</script>";
-        unset($_SESSION['erreur']);
-    }
-    if(isset($_SESSION['success'])){
-        echo "<script>success('$_SESSION[success]');</script>";
-        unset($_SESSION['success']);
-    }
-    include "./inc/footer.html";
+    include "./inc/footer.php";
 ?>

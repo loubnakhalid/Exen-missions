@@ -1,4 +1,27 @@
 $(document).ready(function() {
+    $('button[data-target="#formPJ"]').on('click', function() {
+        var missionId = $(this).data('id');
+        console.log(missionId);
+        $.ajax({
+            url: '../controller.php',
+            type: 'POST',
+            data: { IdMiss: missionId, getMissPJ: true },
+            dataType: 'json',
+            success: function(response) {
+                var text = "";
+                for (var i = 0; i < response.length; i++) {
+                    var row = response[i];
+                    text += "<div class='col mb-3'><input type = 'hidden' name ='IdPJ[]' value ='" + row.IdPJ + "' > <div class = 'image-container' onmouseover = 'showOverlay(this)' onmouseout = 'hideOverlay(this)'> <img src = '../PJ/" + row.NomPJ + "' class = 'PJ' id = 'image" + i + "'> <div class = 'overlay-content d-none'> <input type ='file' name ='file[]' id = 'fileInput" + i + "' style = 'display:none' onchange = 'updateImage(\"image" + i + "\",\"fileInput" + i + "\",\"" + row.IdPJ + "\")' accept = 'image/*,application/pdf'> <label for='fileInput" + i + "'> <i class = 'fa fa-pen '> </i></label> </div> </div> <div class = 'caption '> <b class = 'ms-4' >Petit-déjeuner</b></div></div>";
+                }
+                $("#rowMissPJ").html(text);
+            },
+            error: function() {
+                alert("Une erreur s'est produite lors de la récupération des informations de la mission.");
+            }
+        });
+    });
+});
+$(document).ready(function() {
     var navbar = document.getElementById('main-navbar');
     var navbarBrand = document.getElementById('navbar-brand');
     var navbarList = document.getElementById('navbar-list');
@@ -10,7 +33,6 @@ $(document).ready(function() {
         sidebar.setAttribute("style", "padding:58px 0 0");
     }
 });
-
 window.addEventListener('resize', function() {
     var navbar = document.getElementById('main-navbar');
     var navbarBrand = document.getElementById('navbar-brand');
@@ -34,10 +56,9 @@ $(document).on("click", "#lienValiderRemb", function() {
     var IdMiss = $(this).data('id');
     var TypeMiss = $(this).attr('data-TypeMiss');
     $(".modal-body #IdMissRemb").val(IdMiss);
-    $(" .modal-body h5").html("Type de mission : " + TypeMiss);
+    $(" .modal-body h6").html("Type de mission : " + TypeMiss);
 
 });
-
 
 $(document).ready(function() {
     var table = $('#tableMission').DataTable({
@@ -45,6 +66,10 @@ $(document).ready(function() {
         ordering: false,
         info: false,
         paging: false,
+        language: {
+            "zeroRecords": "Aucun résultat correspondant trouvé",
+            // Autres traductions...
+        }
     });
     $('#searchInput').on('keyup', function() {
         var searchText = $(this).val();
@@ -91,10 +116,10 @@ $(document).ready(function() {
                 $('#MoyTransModif').val(response.MoyTrans);
                 $('#NoteModif').text(response.Note);
                 $('#AccompModif').val(response.Accomp);
-                if (response.TypeMiss == "Journaliere") {
-                    var options = "<option value='Journaliere' selected>Journaliere</option><option value='Mensuel'>Mensuel</option>"
+                if (response.TypeMiss == "Journalière") {
+                    var options = "<option value='Journalière' selected>Journalière</option><option value='Mensuelle'>Mensuelle</option>"
                 } else {
-                    var options = "<option value='Journaliere'>Journaliere</option><option value='Mensuel' selected>Mensuel</option>"
+                    var options = "<option value='Journalière'>Journalière</option><option value='Mensuelle' selected>Mensuelle</option>"
                 }
                 $('#TypeMissModif').html(options);
             },
@@ -122,9 +147,13 @@ $(document).ready(function() {
                 $('#infoRetour').text(response.Retour);
                 $('#infoLieuDép').text(response.LieuDép);
                 $('#infoMoyTrans').text(response.MoyTrans);
-                $('#infoDurée').html(response.Durée + '<b> Jours</b>');
+                $('#infoDurée').html('<b>' + response.Durée + ' Jour(s)</b>');
                 if (response.Montant !== null) {
-                    $('#tableInfoMiss').append('<tr><td>Montant :</td><td id="Montant">' + response.Montant + '<b> DHS</b></td></tr>');
+                    $('.trInfoMontant').css('display', 'contents');
+                    $('#infoMontant').html('<b style="color:#3ec93e" > ' + response.Montant + " DHS </b>");
+                } else {
+                    $('.trInfoMontant').css('display', 'none');
+                    $('#infoMontant').text('');
                 }
             },
             error: function() {
@@ -197,12 +226,14 @@ $(document).ready(function() {
                 $('#EmailModif').val(response.Email);
                 $('#ProfileModif').val(response.Profil);
                 $('#CINModif').val(response.CIN);
-                selectElement = $('#IdG');
+                selectElementGrp = $('#IdG');
+                selectElementCivilité = $('#CivilitéModif');
                 // Récupérer la valeur de IdG de la réponse
                 var selectedIdG = response.IdG;
-
+                var selectedivilité = response.TitreCivilité;
                 // Sélectionner l'option correspondante dans le sélecteur #IdG
-                selectElement.val(selectedIdG);
+                selectElementGrp.val(selectedIdG);
+                selectElementCivilité.val(selectedivilité);
             },
             error: function() {
                 alert('Une erreur s\'est produite lors de la récupération des informations de la mission.');
@@ -252,7 +283,7 @@ $(document).ready(function() {
 });
 
 $(function() {
-    $("#Départ").datepicker({
+    $(".Départ").datepicker({
         altField: "#datepicker",
         closeText: 'Fermer',
         prevText: 'Précédent',
@@ -267,13 +298,13 @@ $(function() {
         dateFormat: 'dd-mm-yy',
         firstDay: '1',
         onSelect: function(selectedDate) {
-            $("#Retour").datepicker("option", "minDate", selectedDate);
-            var retourValue = $("#Retour").val();
+            $(".Retour").datepicker("option", "minDate", selectedDate);
+            var retourValue = $(".Retour").val();
             if (retourValue !== "") {
-                var minRetourDate = $("#Retour").datepicker("option", "minDate");
+                var minRetourDate = $(".Retour").datepicker("option", "minDate");
                 var departDate = $.datepicker.parseDate(dateFormat, selectedDate);
                 if (minRetourDate < departDate) {
-                    $("#Retour").val("").datepicker("refresh");
+                    $(".Retour").val("").datepicker("refresh");
                 }
             }
         },
@@ -282,7 +313,7 @@ $(function() {
             return [(day != 0 && day != 6)];
         },
     });
-    $("#Retour").datepicker({
+    $(".Retour").datepicker({
         altField: "#datepicker",
         closeText: 'Fermer',
         prevText: 'Précédent',
@@ -296,6 +327,19 @@ $(function() {
         weekHeader: 'Sem.',
         dateFormat: 'dd-mm-yy',
         firstDay: '1',
+    });
+});
+$(document).ready(function() {
+    $("#linkModifInfo").click(function(e) {
+        e.preventDefault();
+        $("#cardInfoPerson").hide();
+        $("#cardModifMdsp").show();
+    });
+
+    $("#linkInfoPerso").click(function(e) {
+        e.preventDefault();
+        $("#cardModifMdsp").hide();
+        $("#cardInfoPerson").show();
     });
 });
 var button = document.querySelector('.navbar-toggler');

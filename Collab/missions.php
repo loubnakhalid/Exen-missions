@@ -1,5 +1,4 @@
 <?php
-    require "../vendor/autoload.php";
     include "./inc/header.php";
     $con=\Tets\Oop\DataBase::connect();
     if(isset($_GET['search'])){
@@ -37,13 +36,13 @@
             <h4>Liste des missions</h4>
             <div class="entete">
                 <div class="search-add">
-                    <form class="d-flex" style="/* margin-top: 37px; */margin-right: 14px;" action="missions.php" method="get">
-                        <input class="form-control me-sm-2" type="search" id="searchInput" name="search" placeholder="Search" style="margin-right: -55px!important;border-radius: 11px;height: 41px;">
-                        <button class="btn btn-secondary my-2 my-sm-0" type="submit" style="width: 53px;height: 29px;margin-top: 5px !important;margin-right: 3px;background-color: white !important;border: none !important;color: gray !important;">
+                    <form class="d-flex" style="margin-right: 14px;" action="missions.php" method="get">
+                        <input class="form-control me-sm-2 inptSearch" type="search" id="searchInput" name="search" placeholder="Rechercher" style="margin-right: -55px!important;">
+                        <button class="btn btn-secondary my-2 my-sm-0 subSearch" type="submit" style="margin-top: 5px !important;">
                             <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
                         </button>
                     </form>
-                    <button type="button" class="btn btn-lg btn-primary" style="width: 177px;padding: 5px 2px;height: 38px;font-size: 17px;" data-toggle="modal" data-target="#exampleModalCenter">+ Ajouter mission</button>
+                    <button type="button" class="btn btn-lg btn-primary btnAjt" data-toggle="modal" data-target="#exampleModalCenter">+ Ajouter mission</button>
                 </div>
             </div>
         </div>
@@ -79,7 +78,7 @@
                         else{
                             $statut="Validée";
                             $color="#3ec93e";
-                            $href="onclick=\"document.location.href='../PDF/Ordre_Mission/$row[OrdreMiss]'\"";
+                            $href="../PDF/Ordre_Mission/$row[OrdreMiss]";
                             $colorPrint='#9f9f9f';
                         }
                         echo "
@@ -100,7 +99,7 @@
                                     <lord-icon src='https://cdn.lordicon.com/dnmvmpfk.json' class='info' trigger='hover' data-toggle='modal' data-target='#infoMiss' colors='primary:#0d6efd' data-id='$row[IdMiss]' style='width:20px;height:20px;margin-top: 5px'></lord-icon>
                                 </span>
                                 <span class='dropdown'>
-                                    <i class='fa-sharp fa-solid fa-print disabled' style='border-radius: 4px;color: #ffffff;background-color:$colorPrint ;/* height: 16px; */width: 41px;padding: 5px 0px;' $href  target='_blank' ></i>
+                                    <a href='$href'  target='_blank'><i class='fa-sharp fa-solid fa-print disabled' style='border-radius: 4px;color: #ffffff;background-color:$colorPrint ;/* height: 16px; */width: 41px;padding: 5px 0px;' ></i></a>
                                 </span>
                             </td>
                         </tr>";
@@ -149,35 +148,33 @@
                 </div>
                 <form id="ajtMiss" action="../controller.php" method="POST" onsubmit="return vérifAjtMiss()">
                     <div class="modal-body">
-                        <div class="row-collab">
-                            <input type="hidden" id="collaborateur" name="IdCollab" value="<?= $_SESSION['membre']['IdMb'] ?>">
-                        </div>
-                        <div class="row g-3 mb-3" style="margin-top: 15px">
+                        <input type="hidden" id="collaborateur" name="IdCollab" value="<?= $_SESSION['membre']['IdMb'] ?>">
+                        <div class="row g-3 mb-3">
                             <div class="col">
                                 <label>Objet de la mission</label>
-                                <input type="text" name="ObjMiss" id="ObjMiss" placeholder="Objet de la mission" class="form-control">
+                                <input type="text" name="ObjMiss" id="ObjMiss" placeholder="Objet de la mission" class="form-control mt-1">
                             </div>
                             <div class="col">
                                 <label>Lieu de déplacement</label>
-                                <input type="text" name="LieuDép" id="LieuDép" placeholder="Lieu de déplacement" class="form-control">
+                                <input type="text" name="LieuDép" id="LieuDép" placeholder="Lieu de déplacement" class="form-control mt-1">
                             </div>
                             <div class="col">
                                 <label>Moyen de transport</label>
-                                <input type="text" name="MoyTrans" placeholder="Moyen de transport" class="form-control">
+                                <input type="text" name="MoyTrans" placeholder="Moyen de transport" class="form-control mt-1">
                             </div>
                         </div>
-                        <div class="row mb-3" style="margin-top: 15px;">
+                        <div class="row mb-3">
                             <div class="col-xl col-lg">
                                 <label>Date de départ</label>
-                                <input type="text" name="Départ" id="Départ" placeholder="Date de départ" class="form-control" autocomplete="false">
+                                <input type="text" name="Départ" id="Départ" placeholder="Date de départ" class="form-control mt-1 Départ" autocomplete="false">
                             </div>
                             <div class="col-xl col-lg">
                                 <label>Date de retour</label>
-                                <input type="text" name="Retour" id="Retour" placeholder="Date de retour" class="form-control">
+                                <input type="text" name="Retour" id="Retour" placeholder="Date de retour" class="form-control mt-1 Retour">
                             </div>
                             <div class="col-xl col-lg">
                                 <label>Type mission</label>
-                                <select type="text" name="TypeMiss" id="TypeMission" class="form-select">
+                                <select type="text" name="TypeMiss" id="TypeMission" class="form-select mt-1">
                                     <option value="">Choisir</option>
                                     <option value="Journaliere">Journaliere</option>
                                     <option value="Mensuel">Mensuel</option>
@@ -194,7 +191,7 @@
                             </div>
                             <div class="col-xl col-lg nom_accompagnateur" id="Accomp" style="display: none;">
                                 <label for="nomAccomp">Accompagnateur</label>
-                                <input type="text" class="form-control" name="Accomp" id="nomAccomp" placeholder="Nom de l'accompagnateur">
+                                <input type="text" class="form-control mt-1" name="Accomp" id="nomAccomp" placeholder="Nom de l'accompagnateur ">
                             </div>
                         </div>
                         <div class="row">
@@ -296,13 +293,5 @@
 
 
 <?php
-    if(isset($_SESSION['erreur'])){
-        echo "<script>erreur(\"$_SESSION[erreur]\");</script>";
-        unset($_SESSION['erreur']);
-    }
-    if(isset($_SESSION['success'])){
-        echo "<script>success('$_SESSION[success]');</script>";
-        unset($_SESSION['success']);
-    }
-    include "./inc/footer.html";
+    include "./inc/footer.php";
 ?>

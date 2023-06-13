@@ -20,11 +20,11 @@
 ?>
 <div class="row">
     <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card border-left-warning shadow h-100 py-2">
+        <div class="card border-left-warning h-100 py-2">
             <div class="card-body">
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                        <div class="text-xs font-weight-bold text-info mb-1"  style="font-size: 19px;"> 
                             Collaborateurs</div>
                         <div class="h5 mb-0 font-weight-bold gray"><?=$rslt4?></div>
                     </div>
@@ -37,46 +37,28 @@
     </div>
     <!-- Earnings (Monthly) Card Example -->
     <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card border-left-primary shadow h-100 py-2">
+        <div class="card border-left-primary h-100 py-2">
             <div class="card-body">
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                            Missions</div>
+                        <div class="text-xs font-weight-bold text-primary mb-1" style="font-size: 19px;" >
+                            Missions effectuées</div>
                         <div class="h5 mb-0 font-weight-bold gray"><?=$rslt1?></div>
                     </div>
-                    <div class="col-auto gray">
-                        <i class="fas fa-calendar fa-2x" aria-hidden="true"></i>
+                    <div class="col-auto">
+                        <i class="fas fa-clipboard-list fa-2x gray" aria-hidden="true"></i>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
     <!-- Earnings (Monthly) Card Example -->
     <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card border-left-success shadow h-100 py-2">
+        <div class="card border-left-info h-100 py-2">
             <div class="card-body">
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                        <div class="text-xs font-weight-bold greenText text-uppercase mb-1">Remboursement</div>
-                        <div class="h5 mb-0 font-weight-bold gray"><?=$total?> DHS</div>
-                    </div>
-                    <div class="col-auto gray">
-                        <i class="fas fa-dollar-sign fa-2x" aria-hidden="true"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Earnings (Monthly) Card Example -->
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card border-left-info shadow h-100 py-2">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Missions non remb
+                        <div class="text-xs font-weight-bold text-warning mb-1" style="font-size: 19px;"> Missions non remboursées
                         </div>
                         <div class="row no-gutters align-items-center">
                             <div class="col-auto">
@@ -84,8 +66,21 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-auto">
-                        <i class="fas fa-clipboard-list fa-2x gray" aria-hidden="true"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Earnings (Monthly) Card Example -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-success h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold greenText mb-1"  style="font-size: 19px;"> Total remboursement</div>
+                        <div class="h5 mb-0 font-weight-bold gray"><?=$total?> DHS</div>
+                    </div>
+                    <div class="col-auto gray">
+                        <i class="fas fa-dollar-sign fa-2x" aria-hidden="true"></i>
                     </div>
                 </div>
             </div>
@@ -97,7 +92,7 @@
 </div>
 <div class="row">
     <div class="col">
-        <div class="card shadow mb-4">
+        <div class="card mb-4">
             <div class="card-header py-3">
                 <h6 class="m-0 font-weight-bold text-primary">Missions par mois</h6>
             </div>
@@ -109,7 +104,7 @@
         </div>
     </div>
     <div class="col">
-        <div class="card shadow mb-4">
+        <div class="card mb-4">
             <div class="card-header py-3">
                 <h6 class="m-0 font-weight-bold text-primary">Missions par collaborateur</h6>
             </div>
@@ -123,7 +118,7 @@
 </div>
 <div class="row">
     <div class="col">
-        <div class="card shadow mb-4">
+        <div class="card mb-4">
             <div class="card-header py-3">
                 <h6 class="m-0 font-weight-bold text-primary">Missions par groupe</h6>
             </div>
@@ -135,7 +130,7 @@
         </div>
     </div>
     <div class="col">
-        <div class="card shadow mb-4">
+        <div class="card mb-4">
             <div class="card-header py-3">
                 <h6 class="m-0 font-weight-bold text-primary">Remboursement par collaborateur</h6>
             </div>
@@ -373,6 +368,6 @@
     });
 </script>
 
-<?php 
-include("./inc/footer.html");
+<?php
+    include "./inc/footer.php";
 ?>

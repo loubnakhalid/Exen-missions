@@ -89,7 +89,8 @@ function vérifAjtCollab() {
     var Mdps = document.getElementById("MdpsAjt");
     var Profile = document.getElementById("ProfileAjt");
     var CIN = document.getElementById("CINAjt");
-    var array = [Nom, Prénom, Email, Mdps, Profile, CIN];
+    var Civilité = document.getElementById("CivilitéAjt");
+    var array = [Nom, Prénom, Email, Mdps, Profile, CIN, Civilité];
     var aide = true;
     for (let input of array) {
         if (input.classList.contains('is-invalid')) {
@@ -125,30 +126,60 @@ function vérifAjtCollab() {
                 document.getElementById("errCINAjt").innerHTML = "Veuillez entrer un CIN valide";
             }
         }
+
+        $.ajax({
+            url: '../controller.php',
+            type: 'POST',
+            data: { Email: Email.value, CIN: CIN.value, vérifEmailCinAjt: true },
+            dataType: 'json',
+            async: false,
+            success: function(response) {
+                if (response.hasOwnProperty('erreurCIN')) {
+                    CIN.classList.add('is-invalid');
+                    errPasswordActuelle.style.display = 'block';
+                    errPasswordActuelle.innerHTML = response.erreurCIN;
+                    aide = false;
+                }
+                if (response.hasOwnProperty('erreurEmail')) {
+                    Email.classList.add('is-invalid');
+                    document.getElementById('errEmailAjt').style.display = 'block';
+                    document.getElementById('errEmailAjt').innerHTML = response.erreurEmail;
+                    aide = false;
+                }
+            },
+            error: function() {
+                alert('Une erreur s\'est produite lors de la vérification du CIN et de l\'email.');
+            }
+        });
     }
     return aide;
 }
 
 function vérifModifCollab() {
+    var IdMb = document.getElementById("IdMb").value;
     var Nom = document.getElementById("NomModif");
     var Prénom = document.getElementById("PrénomModif");
     var Email = document.getElementById("EmailModif");
     var Profile = document.getElementById("ProfileModif");
     var CIN = document.getElementById("CINModif");
-    var array = [Nom, Prénom, Email, Profile, CIN];
+    var Civilité = document.getElementById('CivilitéModif');
+    var array = [Nom, Prénom, Email, Profile, CIN, Civilité];
     var aide = true;
+
     for (let input of array) {
         if (input.classList.contains('is-invalid')) {
             input.classList.remove('is-invalid');
         }
     }
+
     for (let input of array) {
         document.getElementById("err" + input.id).innerHTML = "";
     }
+
     for (let input of array) {
         if (input.value == '') {
             aide = false;
-            input.classList += " is-invalid";
+            input.classList.add("is-invalid");
             var err = document.getElementById("err" + input.id);
             if (err) {
                 err.style.display = "block";
@@ -158,7 +189,7 @@ function vérifModifCollab() {
             var validate = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
             if (!validate.test(input.value)) {
                 aide = false;
-                input.classList += " is-invalid";
+                input.classList.add("is-invalid");
                 document.getElementById("errEmailModif").style.display = "block";
                 document.getElementById("errEmailModif").innerHTML = "Veuillez entrer une adresse email valide";
             }
@@ -166,93 +197,37 @@ function vérifModifCollab() {
             var cinRegex = /^[A-Z]{1,2}\d{6}$/;
             if (!cinRegex.test(input.value)) {
                 aide = false;
-                input.classList += " is-invalid";
+                input.classList.add("is-invalid");
                 document.getElementById("errCINModif").style.display = "block";
                 document.getElementById("errCINModif").innerHTML = "Veuillez entrer un CIN valide";
             }
         }
     }
-    return aide;
-}
 
-function vérifModifGroupe() {
-    var Libellé = document.getElementById('LibelléModif');
-    var Taux = document.getElementById('TauxModif');
-    var array = [Libellé, Taux];
-    var aide = true;
-    for (let input of array) {
-        if (input.classList.contains('is-invalid')) {
-            input.classList.remove('is-invalid');
-        }
-    }
-    for (let input of array) {
-        document.getElementById("err" + input.id).innerHTML = "";
-    }
-    for (let input of array) {
-        if (input.value == '') {
-            aide = false;
-            input.classList += " is-invalid";
-            var err = document.getElementById("err" + input.id);
-            if (err) {
-                err.innerHTML = "Champ requis";
-                err.style.display = "block";
+    $.ajax({
+        url: '../controller.php',
+        type: 'POST',
+        data: { IdMb: IdMb, Email: Email.value, CIN: CIN.value, vérifEmailCinModif: true },
+        dataType: 'json',
+        async: false,
+        success: function(response) {
+            if (response.hasOwnProperty('erreurCIN')) {
+                CIN.classList.add('is-invalid');
+                document.getElementById('errCINModif').style.display = 'block';
+                document.getElementById('errCINModif').innerHTML = response.erreurCIN;
+                aide = false;
             }
-        }
-    }
-    return aide;
-}
-
-function vérifAjtFrais() {
-    var Libellé = document.getElementById('LibelléFraisAjt');
-    var Montant = document.getElementById('MontantFraisAjt');
-    var array = [Libellé, Montant];
-    var aide = true;
-    for (let input of array) {
-        if (input.classList.contains('is-invalid')) {
-            input.classList.remove('is-invalid');
-        }
-    }
-    for (let input of array) {
-        document.getElementById("err" + input.id).innerHTML = "";
-    }
-    for (let input of array) {
-        if (input.value == '') {
-            aide = false;
-            input.classList += " is-invalid";
-            var err = document.getElementById("err" + input.id);
-            if (err) {
-                err.innerHTML = "Champ requis";
-                err.style.display = "block";
+            if (response.hasOwnProperty('erreurEmail')) {
+                Email.classList.add('is-invalid');
+                document.getElementById('errEmailModif').style.display = 'block';
+                document.getElementById('errEmailModif').innerHTML = response.erreurEmail;
+                aide = false;
             }
+        },
+        error: function() {
+            alert('Une erreur s\'est produite lors de la vérification du CIN et de l\'email.');
         }
-    }
-    return aide;
-}
-
-function vérifModifFrais() {
-    var Libellé = document.getElementById('LibelléFraisModif');
-    var Montant = document.getElementById('MontantFraisModif');
-    var array = [Libellé, Montant];
-    var aide = true;
-    for (let input of array) {
-        if (input.classList.contains('is-invalid')) {
-            input.classList.remove('is-invalid');
-        }
-    }
-    for (let input of array) {
-        document.getElementById("err" + input.id).innerHTML = "";
-    }
-    for (let input of array) {
-        if (input.value == '') {
-            aide = false;
-            input.classList += " is-invalid";
-            var err = document.getElementById("err" + input.id);
-            if (err) {
-                err.innerHTML = "Champ requis";
-                err.style.display = "block";
-            }
-        }
-    }
+    });
     return aide;
 }
 
@@ -280,29 +255,224 @@ function vérifAjtGroupe() {
             }
         }
     }
+    $.ajax({
+        url: '../controller.php',
+        type: 'POST',
+        data: { Libellé: Libellé.value, vérifLibelleGrp: true },
+        dataType: 'json',
+        async: false,
+        success: function(response) {
+            if (response.hasOwnProperty('erreurLibelle')) {
+                aide = false;
+                Libellé.classList.add('is-invalid');
+                document.getElementById('errLibelléAjt').style.display = 'block';
+                document.getElementById('errLibelléAjt').innerHTML = response.erreurLibelle;
+            }
+        },
+        error: function() {
+            alert('Une erreur s\'est produite lors de la vérification de libellé');
+        }
+    });
+    return aide;
+}
+
+function vérifModifGroupe() {
+    var IdG = document.getElementById('IdGModif');
+    var Libellé = document.getElementById('LibelléModif');
+    var Taux = document.getElementById('TauxModif');
+    var array = [Libellé, Taux];
+    var aide = true;
+    for (let input of array) {
+        if (input.classList.contains('is-invalid')) {
+            input.classList.remove('is-invalid');
+        }
+    }
+    for (let input of array) {
+        document.getElementById("err" + input.id).innerHTML = "";
+    }
+    for (let input of array) {
+        if (input.value == '') {
+            aide = false;
+            input.classList += " is-invalid";
+            var err = document.getElementById("err" + input.id);
+            if (err) {
+                err.innerHTML = "Champ requis";
+                err.style.display = "block";
+            }
+        }
+    }
+    $.ajax({
+        url: '../controller.php',
+        type: 'POST',
+        data: { IdG: IdG.value, Libellé: Libellé.value, vérifLibelleGrpModif: true },
+        dataType: 'json',
+        async: false,
+        success: function(response) {
+            if (response.hasOwnProperty('erreurLibelle')) {
+                aide = false;
+                Libellé.classList.add('is-invalid');
+                document.getElementById('errLibelléModif').style.display = 'block';
+                document.getElementById('errLibelléModif').innerHTML = response.erreurLibelle;
+            }
+        },
+        error: function() {
+            alert('Une erreur s\'est produite lors de la vérification de libellé');
+        }
+    });
+    return aide;
+}
+
+function vérifAjtFrais() {
+    var Libellé = document.getElementById('LibelléFraisAjt');
+    var Montant = document.getElementById('MontantFraisAjt');
+    var array = [Libellé, Montant];
+    var aide = true;
+    for (let input of array) {
+        if (input.classList.contains('is-invalid')) {
+            input.classList.remove('is-invalid');
+        }
+    }
+    for (let input of array) {
+        document.getElementById("err" + input.id).innerHTML = "";
+    }
+    for (let input of array) {
+        if (input.value == '') {
+            aide = false;
+            input.classList += " is-invalid";
+            var err = document.getElementById("err" + input.id);
+            if (err) {
+                err.innerHTML = "Champ requis";
+                err.style.display = "block";
+            }
+        }
+    }
+    $.ajax({
+        url: '../controller.php',
+        type: 'POST',
+        data: { Libellé: Libellé.value, vérifLibelleFrais: true },
+        dataType: 'json',
+        async: false,
+        success: function(response) {
+            if (response.hasOwnProperty('erreurLibelle')) {
+                aide = false;
+                Libellé.classList.add('is-invalid');
+                document.getElementById('errLibelléFraisAjt').style.display = 'block';
+                document.getElementById('errLibelléFraisAjt').innerHTML = response.erreurLibelle;
+            }
+        },
+        error: function() {
+            alert('Une erreur s\'est produite lors de la vérification de libellé');
+        }
+    });
+    return aide;
+}
+
+function vérifModifFrais() {
+    var IdFrais = document.getElementById('IdFraisModif');
+    var Libellé = document.getElementById('LibelléFraisModif');
+    var Montant = document.getElementById('MontantFraisModif');
+    var array = [Libellé, Montant];
+    var aide = true;
+    for (let input of array) {
+        if (input.classList.contains('is-invalid')) {
+            input.classList.remove('is-invalid');
+        }
+    }
+    for (let input of array) {
+        document.getElementById("err" + input.id).innerHTML = "";
+    }
+    for (let input of array) {
+        if (input.value == '') {
+            aide = false;
+            input.classList += " is-invalid";
+            var err = document.getElementById("err" + input.id);
+            if (err) {
+                err.innerHTML = "Champ requis";
+                err.style.display = "block";
+            }
+        }
+    }
+    $.ajax({
+        url: '../controller.php',
+        type: 'POST',
+        data: {
+            IdFrais: IdFrais.value,
+            Libellé: Libellé.value,
+            vérifLibelleFraisModif: true
+        },
+        dataType: 'json',
+        async: false,
+        success: function(response) {
+            if (response.hasOwnProperty('erreurLibelle')) {
+                aide = false;
+                Libellé.classList.add('is-invalid');
+                document.getElementById('errLibelléFraisModif').style.display = 'block';
+                document.getElementById('errLibelléFraisModif').innerHTML = response.erreurLibelle;
+            }
+        },
+        error: function() {
+            alert('Une erreur s\'est produite lors de la vérification de libellé');
+        }
+    });
     return aide;
 }
 
 function vérifRemb() {
     var Montant = document.getElementById("Montant");
     var Paiement = document.getElementById("Paiement");
+    var divPièce = document.getElementById('addFile');
     var aide = true;
+
     if (Montant.classList.contains("is-invalid")) {
         Montant.classList.remove("is-invalid");
     }
+
     if (Paiement.classList.contains("is-invalid")) {
         Paiement.classList.remove("is-invalid");
     }
-    if (Montant.value == '') {
+
+    if (Montant.value === '') {
         aide = false;
-        Montant.classList += " is-invalid";
+        Montant.classList.add("is-invalid");
     }
-    if (Paiement.value == '') {
+
+    if (Paiement.value === '') {
         aide = false;
-        Paiement.classList += " is-invalid";
+        Paiement.classList.add("is-invalid");
     }
+
+    if (divPièce.getElementsByTagName('label').length > 0) {
+        var pièces = divPièce.getElementsByClassName("piece-select");
+        var label = document.getElementsByClassName("piece-label");
+        var noms = divPièce.getElementsByClassName("nom-piece");
+        var types = divPièce.getElementsByClassName("type-piece-select");
+
+        for (let i = 0; i < types.length; i++) {
+            if (types[i].value === '') {
+                aide = false;
+                types[i].classList.add("is-invalid");
+            }
+        }
+
+        for (let i = 0; i < noms.length; i++) {
+            if (noms[i].value === '') {
+                aide = false;
+                noms[i].classList.add("is-invalid");
+            }
+        }
+
+        for (let i = 0; i < pièces.length; i++) {
+            var file = pièces[i].files[0];
+            if (!file) {
+                aide = false;
+                label[i].classList.add("is-invalid");
+            }
+        }
+    }
+
     return aide;
 }
+
 var index = 0;
 
 function addFile() {
@@ -323,7 +493,7 @@ function addFile() {
 
             var label = document.createElement('label');
             label.htmlFor = 'formFile' + index;
-            label.classList.add('form-control');
+            label.classList.add('form-control', 'piece-label');
             label.id = 'labelFile' + index;
             label.textContent = 'Choisir un fichier';
             label.style.backgroundColor = '#dbdbdb';
@@ -390,7 +560,7 @@ function addFile() {
 }
 
 function getOptionsHTML(options) {
-    var optionsHTML = "<option value=\"null\"  data-taux='0'>Type de pièce</option>\n";
+    var optionsHTML = "<option value=\"\"  data-taux='0'>Type de pièce</option>\n";
     // Parcourir les options et les ajouter au HTML
     options.forEach(option => {
         optionsHTML += "<option  value=\"" + option.IdFrais + "\" data-taux=\"" + option.MontantFrais + "\">" + option.LibelléFrais + "</option>\n";
@@ -478,15 +648,118 @@ function hideOverlay(element) {
     overlay.classList.add('d-none');
 }
 
-
-function updateImage(event, imageId) {
-    var fileInput = event.target;
+function updateImage(imageId, fileInputId, IdPJ) {
+    var fileInput = document.getElementById(fileInputId);
     if (fileInput.files && fileInput.files[0]) {
         var reader = new FileReader();
         reader.onload = function(e) {
             var imageElement = document.getElementById(imageId);
             imageElement.src = e.target.result;
         };
-        reader.readAsDataURL(fileInput.files[0]);
+        swal({
+                title: "",
+                text: "voulez-vous vraiment modifier l\'image ?",
+                icon: "warning",
+                buttons: [
+                    "Annuler",
+                    "modifier",
+                ],
+            })
+            .then((willDelete) => {
+                if (willDelete) {
+                    saveModifiedImage(IdPJ, fileInput.files[0]);
+                    reader.readAsDataURL(fileInput.files[0]);
+                } else {
+                    exit;
+                }
+            });
     }
+}
+
+function saveModifiedImage(IdPJ, file) {
+    var formData = new FormData();
+    formData.append('modifPJ', true);
+    formData.append('IdPJ', IdPJ);
+    formData.append('file', file);
+
+    $.ajax({
+        url: '../controller.php',
+        type: 'POST',
+        data: formData,
+        dataType: 'json',
+        processData: false,
+        contentType: false,
+        success: function(response) {
+            console.log('Image modified and saved successfully!');
+        },
+        error: function() {
+            alert("Une erreur s'est produite lors de la modification de l'image.");
+        }
+    });
+}
+
+function vérifModifMdpsCollab() {
+    var IdMb = document.getElementById('IdMb');
+    var passwordActuelle = document.getElementById("PasswordActuelle");
+    var newPassword = document.getElementById("NewPassword");
+    var confirmNewPassword = document.getElementById("ConfirmNewPassword");
+    var errPasswordActuelle = document.getElementById("errPasswordActuelle");
+    var errNewPassword = document.getElementById("errNewPassword");
+    var errConfirmNewPassword = document.getElementById("errConfirmNewPassword");
+    var arrayInput = [passwordActuelle, newPassword, confirmNewPassword];
+    var arrayErr = [errPasswordActuelle, errNewPassword, errConfirmNewPassword];
+    var aide = true;
+    for (let input of arrayInput) {
+        if (input.classList.contains('is-invalid')) {
+            input.classList.remove('is-invalid');
+        }
+    }
+    for (let input of arrayErr) {
+        input.innerHTML = "";
+    }
+    if (passwordActuelle.value == '') {
+        aide = false;
+        passwordActuelle.classList.add('is-invalid');
+        errPasswordActuelle.style.display = 'block';
+        errPasswordActuelle.innerHTML = 'champs requis';
+    }
+    if (aide) {
+        $.ajax({
+            url: '../controller.php',
+            type: 'POST',
+            data: { Mdps: passwordActuelle.value, IdMb: IdMb.value, vérifMdps: true },
+            dataType: 'text',
+            async: false,
+            success: function(response) {
+                if (response == "1") {
+                    passwordActuelle.classList.add('is-invalid');
+                    errPasswordActuelle.style.display = 'block';
+                    errPasswordActuelle.innerHTML = "Mot de passe incorrect";
+                    aide = false;
+                }
+            },
+            error: function() {
+                alert('Une erreur s\'est produite lors de la vérification du CIN et de l\'email.');
+            }
+        });
+    }
+    if (newPassword.value == '') {
+        aide = false;
+        newPassword.classList.add('is-invalid');
+        errNewPassword.style.display = 'block';
+        errNewPassword.innerHTML = 'champs requis';
+    }
+    if (confirmNewPassword.value == '') {
+        aide = false;
+        confirmNewPassword.classList.add('is-invalid');
+        errConfirmNewPassword.style.display = 'block';
+        errConfirmNewPassword.innerHTML = 'champs requis';
+    } else if (newPassword.value != confirmNewPassword.value) {
+        aide = false;
+        confirmNewPassword.classList.add('is-invalid');
+        errConfirmNewPassword.style.display = 'block';
+        errConfirmNewPassword.innerHTML = 'Les deux mots de passes ne sont pas identiques !';
+    }
+
+    return aide;
 }

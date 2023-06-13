@@ -38,19 +38,19 @@
             <h4>Liste des frais</h4>
             <div class="entete">
                 <div class="search-add">
-                    <form class="d-flex" style="/* margin-top: 37px; */margin-right: 14px;" action="frais.php" method="get">
-                        <input class="form-control me-sm-2" type="search" id="searchInput" name="search" placeholder="Search" style="margin-right: -55px!important;border-radius: 11px;height: 41px;">
-                        <button class="btn btn-secondary my-2 my-sm-0" type="submit" style="width: 53px;height: 29px;margin-top: 5px !important;margin-right: 3px;background-color: white !important;border: none !important;color: gray !important;">
+                    <form class="d-flex" style="margin-right: 14px;" action="frais.php" method="get">
+                        <input class="form-control me-sm-2 inptSearch" type="search" id="searchInput" name="search" placeholder="Rechercher" style="margin-right: -55px!important">
+                        <button class="btn btn-secondary my-2 my-sm-0 subSearch" type="submit" style="margin-top: 5px !important;">
                             <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
                         </button>
                     </form>
-                    <button type="button" class="btn btn-lg btn-primary" style="width: 177px;padding: 5px 2px;height: 38px;font-size: 17px;" data-toggle="modal" data-target="#ajtFrais">+ Ajouter frais</button>
+                    <button type="button" id="btnAjtFrais" class="btn btn-lg btn-primary btnAjt" data-toggle="modal" data-target="#ajtFrais">+ Ajouter frais</button>
                 </div>
             </div>
         </div>
         <div class="card-body">
             <div class="table table-responsive">
-                <table id="tableMiss" cellspacing='0'>
+                <table id="tableMission" cellspacing='0'>
                     <thead>
                         <tr>
                             <th>#</th>
@@ -69,7 +69,7 @@
                             <td>$row[MontantFrais] DH</td>
                             <td class='action'>
                                 <span>
-                                    <i class='fa-solid fa-pen icnModifFrais'  data-toggle='modal' data-target='#modifFrais' data-id='$row[IdFrais]' style='color: orange;font-size: 19px;'></i>
+                                    <i class='fa-solid fa-pen icnModifFrais' id='btnModifFrais' data-toggle='modal' data-target='#modifFrais' data-id='$row[IdFrais]' style='color: orange;font-size: 19px;'></i>
                                 </span>
                                 <span>
                                     <i class='fa-solid fa-trash fa-2x' style='color: #e82626;font-size: 20px !important' onclick=\"confirmSupp('frais',$row[IdFrais],$page)\"></i>
@@ -178,16 +178,7 @@
             </div>
         </div>
     </div>
-
-
+    
 <?php
-    if(isset($_SESSION['erreur'])){
-        echo "<script>erreur(\"$_SESSION[erreur]\");</script>";
-        unset($_SESSION['erreur']);
-    }
-    if(isset($_SESSION['success'])){
-        echo "<script>success('$_SESSION[success]');</script>";
-        unset($_SESSION['success']);
-    }
-    include "./inc/footer.html";
+    include "./inc/footer.php";
 ?>

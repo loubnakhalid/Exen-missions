@@ -1,8 +1,7 @@
 <?php
-    require "../vendor/autoload.php";
     include "./inc/header.php";
     use \Tets\Oop\DataBase;
-    $con=\Tets\Oop\DataBase::connect();
+    $con=DataBase::connect();
     if(isset($_GET['search'])){
         $count=$con->query("select count(IdG) as cpt from groupes where (IdG like '%$_GET[search]%' or Libellé like '%$_GET[search]%' or TauxG like '%$_GET[search]%') ");
     }
@@ -39,19 +38,19 @@
             <h4>Liste des groupes</h4>
             <div class="entete">
                 <div class="search-add">
-                    <form class="d-flex" style="/* margin-top: 37px; */margin-right: 14px;" action="groupes.php" method="get">
-                        <input class="form-control me-sm-2" type="search" id="searchInput" name="search" placeholder="Search" style="margin-right: -55px!important;border-radius: 11px;height: 41px;">
-                        <button class="btn btn-secondary my-2 my-sm-0" type="submit" style="width: 53px;height: 29px;margin-top: 5px !important;margin-right: 3px;background-color: white !important;border: none !important;color: gray !important;">
+                    <form class="d-flex" style="margin-right: 14px;" action="groupes.php" method="get">
+                        <input class="form-control me-sm-2 inptSearch" type="search" id="searchInput" name="search" placeholder="Rechercher" style="margin-right: -55px!important;">
+                        <button class="btn btn-secondary my-2 my-sm-0 subSearch" type="submit" style="margin-top: 5px !important;">
                             <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
                         </button>
                     </form>
-                    <button type="button" class="btn btn-lg btn-primary" style="width: 177px;padding: 5px 2px;height: 38px;font-size: 17px;" data-toggle="modal" data-target="#ajtGroupe">+ Ajouter groupe</button>
+                    <button type="button" id="btnAjtGrp" class="btn btn-lg btn-primary btnAjt"  data-toggle="modal" data-target="#ajtGroupe">+ Ajouter groupe</button>
                 </div>
             </div>
         </div>
         <div class="card-body">
             <div class="table table-responsive">
-                <table id="tableMiss" cellspacing='0'>
+                <table id="tableMission" cellspacing='0'>
                     <thead>
                         <tr>
                             <th>#</th>
@@ -70,7 +69,7 @@
                             <td>$row[TauxG]</td>
                             <td class='action'>
                                 <span>
-                                    <i class='fa-solid fa-pen icnModifGroupe'  data-toggle='modal' data-target='#modifGroupe' data-id='$row[IdG]' style='color: orange;font-size: 19px;'></i>
+                                    <i class='fa-solid fa-pen icnModifGroupe' id='btnModifGrp'  data-toggle='modal' data-target='#modifGroupe' data-id='$row[IdG]' style='color: orange;font-size: 19px;'></i>
                                 </span>
                                 <span>
                                     <i class='fa-solid fa-trash fa-2x' style='color: #e82626;font-size: 20px !important' onclick=\"confirmSupp('groupes',$row[IdG],$page)\"></i>
@@ -122,7 +121,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                <form action="../controller.php" method="post" enctype="multipart/form-data" onsubmit="return vérifAjtGroupe()">
+                <form id="formAjtGrp" action="../controller.php" method="post" enctype="multipart/form-data" onsubmit="return vérifAjtGroupe()">
                         <input type="hidden" name="IdG" id="IdG">
                         <div class="row g-3 mb-3">
                             <div class="col">
@@ -179,16 +178,6 @@
             </div>
         </div>
     </div>
-   
-
 <?php
-    if(isset($_SESSION['erreur'])){
-        echo "<script>erreur(\"$_SESSION[erreur]\");</script>";
-        unset($_SESSION['erreur']);
-    }
-    if(isset($_SESSION['success'])){
-        echo "<script>success('$_SESSION[success]');</script>";
-        unset($_SESSION['success']);
-    }
-    include "./inc/footer.html";
+    include "./inc/footer.php";
 ?>

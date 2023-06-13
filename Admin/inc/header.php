@@ -1,7 +1,6 @@
 <?php
-
   use Tets\Oop\Membre;
-
+  require "../vendor/autoload.php";
   session_start();
   if(!Membre::Admin()){
     header("location:../index.php");
@@ -19,7 +18,6 @@
       <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
       <script src="../inc/js/jsBoot/bootstrap.min.js" ></script>
       <script src="https://cdn.lordicon.com/ritcuqlt.js"></script>
-      <link rel="stylesheet" href="../node_modules/font-awesome/css/font-awesome.min.css">
       <script src="https://kit.fontawesome.com/9f23a76265.js" crossorigin="anonymous"></script>
       <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
       <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">

@@ -10,26 +10,32 @@
          <div class="card-header  py-3"><h6 class="m-0 font-weight-bold text-primary">Historique des modifications</h6></div>
          <div class="card-body" style="max-height: 480px;overflow-y: auto;">
          <?php
-            $row=DataBase::getDataWhere('historique',"TypeAction<>'Connexion' and TypeAction<>'Déconnexion' order by DateAction desc");
+            $row=DataBase::getDataWhere('historique',"TypeAction<>'Connexion' and TypeAction<>'Déconnexion' order by IdAction desc");
             $aide=true;
-            foreach($row as $row){
-               if($row['TypeAction']=='Suppression'){
-                  $color='red';
-                  $background='#ffe7e7';
+            if($row){
+               foreach($row as $row){
+                  if($row['TypeAction']=='Suppression'){
+                     $color='red';
+                     $background='#ffe7e7';
+                  }
+                  elseif($row['TypeAction']=='Modification'){
+                     $color='orange';
+                     $background='#fff8ee';
+                  }
+                  elseif($row['TypeAction']=='Ajout'){
+                     $color='#1e8af7';
+                     $background='#ebf6ff';
+                  }
+                  elseif($row['TypeAction']=='Validation de mission' || $row['TypeAction']=='Validation de remboursement' || $row['TypeAction']=='Validation'){
+                     $color='#43d90d';
+                     $background='#e1ffe1';
+                  }
+                  else{
+                     $color='black';
+                     $background='white';
+                  }
+                  echo "<div class='row mb-2 sec-histo' style='background-color:$background'><div class='col-1'><i class='fa-solid fa-circle' style='font-size:9px;color:$color'></i></div><div class='col'>$row[TypeAction]</div><div class='col-4'>$row[ElementAction]</div><div class='col'>$row[DateAction]</div></div>";
                }
-               elseif($row['TypeAction']=='Modification'){
-                  $color='orange';
-                  $background='#fff8ee';
-               }
-               elseif($row['TypeAction']=='Ajout'){
-                  $color='#1e8af7';
-                  $background='#ebf6ff';
-               }
-               elseif($row['TypeAction']=='Validation de mission' || $row['TypeAction']=='Validation de remboursement' || $row['TypeAction']=='Validation'){
-                  $color='#43d90d';
-                  $background='#e1ffe1';
-               }
-               echo "<div class='row mb-2 sec-histo' style='background-color:$background'><div class='col-1'><i class='fa-solid fa-circle' style='font-size:9px;color:$color'></i></div><div class='col'>$row[TypeAction]</div><div class='col-4'>$row[ElementAction]</div><div class='col'>$row[DateAction]</div></div>";
             }
             $id=$_SESSION['membre']['IdMb'];
             $row2=DataBase::getDataWhere('membres',"IdMb=$id");
@@ -78,16 +84,18 @@
                   <?php
                      $row=DataBase::getDataWhere('historique',"TypeAction='Connexion' or TypeAction='Déconnexion' order by DateAction desc");
                      $aide=true;
-                     foreach($row as $row){
-                        if($row['TypeAction']=='Déconnexion'){
-                           $color='red';
-                           $background='#ffe7e7';
+                     if($row){
+                        foreach($row as $row){
+                           if($row['TypeAction']=='Déconnexion'){
+                              $color='red';
+                              $background='#ffe7e7';
+                           }
+                           elseif($row['TypeAction']=='Connexion'){
+                              $color='#43d90d';
+                              $background='#e1ffe1';
+                           }
+                           echo "<div class='row mb-2 sec-histo' style='background-color:$background'><div class='col-1'><i class='fa-solid fa-circle' style='font-size:9px;color:$color'></i></div><div class='col'>$row[TypeAction]</div><div class='col'>$row[DateAction]</div></div>";
                         }
-                        elseif($row['TypeAction']=='Connexion'){
-                           $color='#43d90d';
-                           $background='#e1ffe1';
-                        }
-                        echo "<div class='row mb-2 sec-histo' style='background-color:$background'><div class='col-1'><i class='fa-solid fa-circle' style='font-size:9px;color:$color'></i></div><div class='col'>$row[TypeAction]</div><div class='col'>$row[DateAction]</div></div>";
                      }
                   ?>
                </div>
@@ -98,13 +106,5 @@
 </div>
 
 <?php
-   if(isset($_SESSION['erreur'])){
-      echo "<script>erreur(\"$_SESSION[erreur]\");</script>";
-      unset($_SESSION['erreur']);
-   }
-   if(isset($_SESSION['success'])){
-      echo "<script>success('$_SESSION[success]');</script>";
-      unset($_SESSION['success']);
-   }
-   include "./inc/footer.html";
+    include "./inc/footer.php";
 ?>

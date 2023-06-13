@@ -1,7 +1,12 @@
 <?php
 
     use Tets\Oop\DataBase;
-    use \Tets\Oop\Membre;
+    use Tets\Oop\Membre;
+    use Tets\Oop\Groupe;
+    use Tets\Oop\Frais;
+    use Tets\Oop\Mission;
+    use Tets\Oop\ChiffreEnLettre;
+    use Tets\Oop\Historique;
 
     session_start();
 
@@ -38,12 +43,12 @@
                 break;
         }
     }
-
+    //Traitement de connexion
     if(isset($_POST['con'])) {
         $Email=strtolower(trim($_POST['Email']));
         setcookie('Email', $Email, time() + 600);
         try {
-            $row=\Tets\Oop\DataBase::getDataWhere('membres', "Email='$Email'");
+            $row=DataBase::getDataWhere('membres', "Email='$Email'");
             if (! $row) {
                 setcookie('Email', '', time() - 1);
                 $_SESSION['errEmailLog'] = 'Email incorrecte ! Veuillez réssayer';
@@ -51,13 +56,13 @@
             } else {
                 $Mdps = $_POST['Mdps'];
                 if (Membre::password_decrypt($Mdps, $row[0]['Mdps'])) {
-                    //Stocker les informations du membre dans la session--------------------------------------------------------------------//
+                    //Stocker les informations du membre dans la session
                     foreach ($row[0] as $indice => $element) {
                         if ($indice != 'Mdps') {
                             $_SESSION['membre'][$indice] = $element;
                         }
                     }
-                    //Redirection selon le type de membre (Admin ou collab)----------------------------------------------------------------------------------//
+                    //Redirection selon le type de membre (Admin ou collab)
                     if(Membre::Admin()){
                         if(DataBase::insertData("historique",array(
                             "TypeAction" => "Connexion",
@@ -83,296 +88,369 @@
             $_SESSION['erreurLog']="Erreur à la connexion ! Veuillez réssayer plut tard ou contactez-nous";
         }
     }
-    elseif(isset($_POST['ajtCollab'])){
-        $con= DataBase::connect();
-        $row=\Tets\Oop\DataBase::getDataWhere('membres',"Email='$_POST[Email]'");
-        $row1=\Tets\Oop\DataBase::getDataWhere('membres',"CIN='$_POST[CIN]'");
-        $Mdps=password_hash($_POST['Mdps'],PASSWORD_DEFAULT,['cost'=>14]);
-        if(!$row && !$row1){
-            if($con->exec("insert into membres (IdG,Statut,Nom,Prénom,Email,Mdps,CIN,Profil) values ('$_POST[Grp]',0,'$_POST[Nom]','$_POST[Prénom]','$_POST[Email]','$Mdps','$_POST[CIN]',' $_POST[Profil]')")){
-                $id=$con->lastInsertId();
-                if(DataBase::insertData("historique",array(
-                    "TypeAction" => "Ajout",
-                    "DateAction" => date("d/m/20y H:i:s"),
-                    "DescriptionAction" => "Ajout du collaborateur $id ",
-                ))){
-                    $_SESSION['success']="Collaborateur ajouté avec succés ! ";
+    //Traitements sur la table Membre
+    /*Ajouter un collaborateur*/
+    elseif (isset($_POST['ajtCollab'])) {
+        try{
+            $hashedPassword = password_hash($mdp, PASSWORD_DEFAULT, ['cost' => 14]);
+            $membre=new Membre('',$_POST['Nom'],$_POST['Prénom'],$_POST['TitreCivilité'],$_POST['Grp'],$_POST['Email'],$hashedPassword,$_POST['CIN'], $_POST['Profil']);
+            if($membre->ajouterCollaborateur()){
+                $id=Membre::getLastId();
+                $historique=new Historique('Ajout',date("d/m/20y H:i:s"),"Collaborateur $id");
+                if($historique->insertHistorique()){
+                    $_SESSION['erreurAjt']=true;
+                    $_SESSION['success'] = "Collaborateur ajouté avec succès !";
                     header("location:./admin/collabs.php");
                 }
                 else{
-                    echo "erreur";
+                    $_SESSION['erreur']='Erreur lors de l\'ajout du collaborateur ! Veuillez réssayer.';
+                    header("location:./admin/collabs.php");
                 }
             }
             else{
-                echo "erreur";
+                $_SESSION['erreur']='Erreur lors de l\'ajout du collaborateur ! Veuillez réssayer.';
+                header("location:./admin/collabs.php");
             }
         }
-        else{
-            if($row){
-                $_SESSION['erreurEmail']="Email déjà utilisé ! Veuillez réessayer";
-            }
-            if($row1){
-                $_SESSION['erreurCIN']="CIN existe déjà ! Veuillez réessayer";
-            }
+        catch(Exception | Error $e){
+            $_SESSION['erreur']='Erreur lors de l\'ajout du collaborateur ! Veuillez réssayer.';
             header("location:./admin/collabs.php");
         }
     }
-    elseif(isset($_POST['modifCollab'])){
-        $row=\Tets\Oop\DataBase::getDataWhere('membres',"Email='$_POST[Email]' and IdMb != '$_POST[IdMb]'");
-        if(!$row){
-            $row1=\Tets\Oop\DataBase::getDataWhere('membres',"CIN='CIN' and IdMb<>$_POST[IdMb]");
-            if(!$row1){
-                if(isset($_POST['Mdps'])){
-                    if(\Tets\Oop\DataBase::updateData('membres',array(
-                        "Nom" => $_POST['Nom'],
-                        "Prénom" => $_POST['Prénom'],
-                        "IdG" => $_POST['Grp'],
-                        "Email" => $_POST['Email'],
-                        "Mdps" => \Tets\Oop\Membre::password_encrypt($_POST['Mdps']),
-                        "CIN" => $_POST['CIN'],
-                        "Profil" => $_POST['Profil'],
-                    ),"IdMb=$_POST[IdMb]")){
-                        if(DataBase::insertData("historique",array(
-                            "TypeAction" => "Modification",
-                            "DateAction" => date("d/m/20y H:i:s"),
-                            "ElementAction" => "Collaborateur $_POST[IdMb]",
-                        ))){
-                            $_SESSION['success']="Collaborateur modifié avec succés ! ";
-                            header("location:./admin/collabs.php");
-                        }
-                        else{
-                            echo "erreur";
-                        }
-                    }
-                    else{
-                        echo "erreur";
-                    }
-                }
-                else{
-                    if(\Tets\Oop\DataBase::updateData('membres',array(
-                        "Nom" => $_POST['Nom'],
-                        "Prénom" => $_POST['Prénom'],
-                        "IdG" => $_POST['Grp'],
-                        "Email" => $_POST['Email'],
-                        "CIN" => $_POST['CIN'],
-                        "Profil" => $_POST['Profil'],
-                    ),"IdMb=$_POST[IdMb]")){
-                        header("location:./admin/collabs.php");
-                    }
-                    else{
-                        echo "erreur";
-                    }
-                }
+    /*Modifier un collaborateur*/
+    elseif (isset($_POST['modifCollab'])) {
+            $membre=new Membre($_POST['IdMb'],$_POST['Nom'],$_POST['Prénom'],$_POST['TitreCivilité'],$_POST['IdG'],$_POST['Email'],'',$_POST['CIN'],$_POST['Profil']);
+            if (isset($_POST['Mdps'])) {
+                $membre->setMdps(Membre::password_encrypt($_POST['Mdps']));
             }
-            else{
-                echo "CIN existe déjà ! Veuillez réessayer";
-                $_SESSION['erreurCIN']="CIN existe déjà ! Veuillez réessayer";
-            }
-        }
-        else{
-            echo "Email déjà utilisé ! Veuillez réessayer";
-            $_SESSION['erreurEmail']="Email déjà utilisé ! Veuillez réessayer";
-        }
-    }
-    elseif(isset($_GET['suppCollab']) && isset($_GET['IdMb'])){
-        if(\Tets\Oop\DataBase::deleteData('membres',"IdMb=$_GET[IdMb]")){
-            if(DataBase::insertData("historique",array(
-                "TypeAction" => "Suppression",
-                "DateAction" => date("d/m/20y H:i:s"),
-                "DescriptionAction" => "Suppression du collaborateur $_GET[IdMb]",
-            ))){
-                $_SESSION['success']="Collaborateur supprimé avec succés ! ";
-                header("location:./admin/collabs.php?page=$_GET[page]");
-            }
-            else{
-                echo "erreur";
-            }
-        }
-        else{
-            echo "erreur";
-        }
-    }
-    elseif(isset($_POST['ajtMiss'])){
-        $Départ = new DateTime("$_POST[Départ]"); // date de début
-        $Retour = new DateTime("$_POST[Retour]"); // date de fin
-        if($_POST["TypeMiss"]=='Journalier'){
-            $nbJours = 0;
-            while ($Départ <= $Retour) {
-                // on vérifie si la date courante est un samedi ou un dimanche
-                if ($Départ->format('N') < 6) {
-                    $nbJours++;
-                }
-                // on incrémente la date de 1 jour
-                $Départ->modify('+1 day');
-            }
-        }
-        else{
-            $nbJours = 0;
-            while ($Départ <= $Retour) {
-                // on vérifie si la date courante est un samedi ou un dimanche
-                $nbJours++;
-                // on incrémente la date de 1 jour
-                $Départ->modify('+1 day');
-            }
-        }
-        $DateMiss=date("d/m/20y H:i:s");
-        $con=DataBase::connect();
-        $ref=\Tets\Oop\Missions::generate_ref();
-        $rslt=\Tets\Oop\DataBase::insertData('missions',array(
-            "RéfMiss" => $ref,
-            "IdMb" =>  $_POST['IdCollab'],
-            "ObjMiss" => $_POST['ObjMiss'],
-            "LieuDép" => $_POST['LieuDép'],
-            "MoyTrans" => $_POST['MoyTrans'],
-            "Départ" => $_POST['Départ'],
-            "Retour" => $_POST['Retour'],
-            "Durée" => $nbJours,
-            "DateMiss" => $DateMiss,
-            "TypeMiss" => $_POST['TypeMiss'],
-            "Accomp" => $_POST['Accomp'],
-            "Note" => $_POST['Note'],
-            "StatutMiss" => "0",
-        ));
-        if($rslt){
-            if(DataBase::insertData("historique",array(
-                "TypeAction" => "Ajout",
-                "DateAction" => date("d/m/20y H:i:s"),
-                "DescriptionAction" => "Ajout de la mission $ref ",
-            ))){
-                $_SESSION['success']="Mission ajoutée avec succés ! ";
+            if ($membre->modifierCollaborateur()) {
                 if(Membre::Admin()){
-                    header("location:./admin/missions.php");
+                    $historique=new Historique('Modification',date("d/m/20y H:i:s"),"Collaborateur $_POST[IdMb]");
+                    if($historique->insertHistorique()){
+                        $_SESSION['success'] = "Collaborateur modifié avec succès !";
+                    }
+                    else{
+                        $_SESSION['erreur']='Erreur lors de ma modification du collaborateur ! Veuillez réssayer.';
+                    }
                 }
                 elseif(Membre::Collab()){
-                    header("location:./collab/missions.php");
+                    $_SESSION['success'] = "Informations modifiées avec succès !";
                 }
             }
             else{
-                echo "erreur";
+                $_SESSION['erreur']='Erreur lors de ma modification du collaborateur ! Veuillez réssayer.';
             }
+
+        /*if(Membre::Admin()){
+            header("location:./admin/collabs.php");
         }
-        else{
-            if(Membre::Admin()){
-                header("location:./admin/missions.php");
-            }
-            elseif(Membre::Collab()){
-                header("location:./collab/missions.php");
-            }
-        }
-        exit;
+        elseif(Membre::Collab()){
+            header("location:./Collab/profil.php");
+
+        }*/
     }
+    /*Supprimer un collaborateur*/
+    elseif (isset($_GET['suppCollab']) && isset($_GET['IdMb'])) {
+        if (Membre::delete($_GET['IdMb'])) {
+            $historique=new Historique('Suppression',date("d/m/20y H:i:s"),"Collaborateur $_GET[IdMb]");
+            if($historique->insertHistorique()){
+                $_SESSION['success'] = "Collaborateur supprimé avec succès !";
+                header("location:./admin/collabs.php?page=$_GET[page]");
+            }
+            else {
+                $_SESSION['erreur']='Erreur lors de la suppression du collaborateur ! Veuillez réssayer.';
+                header("location:./admin/collabs.php");
+            }
+        } else {
+            $_SESSION['erreur']='Erreur lors de la suppression du collaborateur ! Veuillez réssayer.';
+            header("location:./admin/collabs.php");
+        }
+    }
+    /*Modifier les informations de l'administrateur*/
+    elseif(isset($_POST['modifAdmin'])){
+        try{
+            $id=$_SESSION['membre']['IdMb'];
+            $ancienMembre=Membre::getById($id);
+            $ancienNom=$ancienMembre->getNom();
+            $ancienPrénom=$ancienMembre->getPrénom();
+            $ancienEmail=$ancienMembre->getEmail();
+            if($_POST['Nom']==$ancienNom && $_POST['Prénom']==$ancienPrénom && $_POST['Email']==$ancienEmail){
+                $_SESSION['success']="Aucun changement détecté. Pas de mise à jour effectuée.";
+                header("location:./admin/profil.php");
+            }
+            else{
+                $membre=new Membre($id,$_POST['Nom'],$_POST['Prénom'],'','',$_POST['Email'],"","","");
+                if($membre->modifierAdmin()){
+                    $historique=new Historique('Modification',date("d/m/20y H:i:s"),'Administrateur');
+                    if($historique->insertHistorique()){
+                        $_SESSION['success']="Informations modifiées avec succès";
+                        header("location:./admin/profil.php");
+                    }
+                    else{
+                        $_SESSION['erreur']="Erreur à la modification des Informations ! Veuillez réssayer";
+                        header("location:./admin/profil.php");
+                    }
+                }else{
+                    $_SESSION['erreur']="Erreur à la modification des Informations ! Veuillez réssayer";
+                    header("location:./admin/profil.php");
+                }
+            }
+        }
+        catch(Exception | Error $e){
+            $_SESSION['erreur']="Erreur à la modification des Informations ! Veuillez réssayer";
+            header("location:./admin/profil.php");
+        }
+        
+    }
+    /*Modifier mot de passe collaborateur*/
+    elseif(isset($_POST['modifMdpsCollab'])){
+        $IdMb=$_POST['IdMb'];
+        $Mdps=password_hash($_POST['Mdps'],PASSWORD_DEFAULT, ['cost' => 14]);
+        try{
+            if(DataBase::updateData('membres',array('Mdps'=>$Mdps,),"IdMb=$IdMb")){
+                $_SESSION['success']="Mot de passe modifié avec succès ! ";
+            }
+            else{
+                $_SESSION['erreur']="Erreur lors la modification de mot de passe ! Veuillez réssayer. ";
+            }
+        }catch(Exception|Error $e){
+                $_SESSION['erreur']="Erreur lors la modification de mot de passe ! Veuillez réssayer. ";
+        }
+        header("location:./collab/profil.php");
+    }
+    //Traitements sur la table mission
+    /*Ajouter une mission*/
+    elseif(isset($_POST['ajtMiss'])){
+        try{
+            $Départ = new DateTime("$_POST[Départ]"); // date de début
+            $Retour = new DateTime("$_POST[Retour]"); // date de fin
+            if($_POST["TypeMiss"]=='Journalière'){
+                $nbJours = 0;
+                while ($Départ <= $Retour) {
+                    // on vérifie si la date courante est un samedi ou un dimanche
+                    if ($Départ->format('N') < 6) {
+                        $nbJours++;
+                    }
+                    // on incrémente la date de 1 jour
+                    $Départ->modify('+1 day');
+                }
+            }
+            else{
+                $nbJours = 0;
+                while ($Départ <= $Retour) {
+                    // on vérifie si la date courante est un samedi ou un dimanche
+                    $nbJours++;
+                    // on incrémente la date de 1 jour
+                    $Départ->modify('+1 day');
+                }
+            }
+            $DateMiss=date("d/m/20y H:i:s");
+            $ref=Mission::generate_ref();
+            $mission=new Mission('',$ref,$_POST['IdCollab'],$_POST['ObjMiss'],$_POST['LieuDép'],$_POST['MoyTrans'],$_POST['Départ'],$_POST['Retour'],$nbJours,$DateMiss,$_POST['TypeMiss'],$_POST['Accomp'],$_POST['Note'],"0");
+            if($mission->ajouterMission()){
+                $historique=new Historique('Ajout',date("d/m/20y H:i:s"),"Mission $ref");
+                if($historique->insertHistorique()){
+                    $_SESSION['success']="Mission ajoutée avec succés ! ";
+                }
+                else{
+                    $_SESSION['erreur']="Erreur à l'ajout de la mission ! Veuillez réssayer. ";
+                }
+            }
+            else{
+                $_SESSION['erreur']="Erreur à l'ajout de la mission ! Veuillez réssayer. ";
+            }
+        }catch(Exception | Error $e){
+            $_SESSION['erreur']="Erreur à l'ajout de la mission ! Veuillez réssayer. ";
+        }
+        if(Membre::Admin()){
+            header("location:./admin/missions.php");
+        }
+        elseif(Membre::Collab()){
+            header("location:./collab/missions.php");
+        }
+    }
+    /*Modifier une mission*/
     elseif (isset($_POST['modifMiss'])){
         $IdMiss=$_POST["IdMiss"];
-        $Départ = new DateTime("$_POST[Départ]"); // date de début
-        $Retour = new DateTime("$_POST[Retour]"); // date de fin
-        if($_POST["TypeMiss"]=='Journalier'){
-            $nbJours = 0;
-            while ($Départ <= $Retour) {
-                // on vérifie si la date courante est un samedi ou un dimanche
-                if ($Départ->format('N') < 6) {
-                    $nbJours++;
+        $ref=Mission::getRef($_POST['IdMiss']);
+        try{
+            $Départ = new DateTime("$_POST[Départ]"); // date de début
+            $Retour = new DateTime("$_POST[Retour]"); // date de fin
+            if($_POST["TypeMiss"]=='Journalière'){
+                $nbJours = 0;
+                while ($Départ <= $Retour) {
+                    // on vérifie si la date courante est un samedi ou un dimanche
+                    if ($Départ->format('N') < 6) {
+                        $nbJours++;
+                    }
+                    // on incrémente la date de 1 jour
+                    $Départ->modify('+1 day');
                 }
-                // on incrémente la date de 1 jour
-                $Départ->modify('+1 day');
-            }
-        }
-        else{
-            $nbJours = 0;
-            while ($Départ <= $Retour) {
-                // on vérifie si la date courante est un samedi ou un dimanche
-                $nbJours++;
-                // on incrémente la date de 1 jour
-                $Départ->modify('+1 day');
-            }
-        }
-        $row=DataBase::getDataWhere("missions","IdMiss=$IdMiss");
-        $ref=$row[0]['RéfMiss'];
-        if(\Tets\Oop\DataBase::updateData('missions',array(
-            "IdMb" => $_POST['IdMb'],
-            "Accomp" => $_POST['Accomp'],
-            "ObjMiss" => $_POST['ObjMiss'],
-            "LieuDép" => $_POST["LieuDép"],
-            "MoyTrans" => $_POST['MoyTrans'],
-            "Départ" => $_POST['Départ'],
-            "Retour" => $_POST['Retour'],
-            "Durée" => $nbJours,
-            "TypeMiss" => $_POST['TypeMiss'],
-            "Note" => $_POST['Note'],
-        ),"IdMiss=$IdMiss")){
-            if(DataBase::insertData("historique",array(
-                "TypeAction" => "Modification",
-                "DateAction" => date("d/m/20y H:i:s"),
-                "DescriptionAction" => "Modification de la mission $ref",
-            ))){
-                $_SESSION['success']="Mission modifiée avec succés ! ";
-                header("location:./admin/missions.php?page=$_GET[page]");
             }
             else{
-                echo "erreur";
+                $nbJours = 0;
+                while ($Départ <= $Retour) {
+                    // on vérifie si la date courante est un samedi ou un dimanche
+                    $nbJours++;
+                    // on incrémente la date de 1 jour
+                    $Départ->modify('+1 day');
+                }
+            }
+            $DateMiss=date("d/m/20y H:i:s");
+            $mission=new Mission($IdMiss,$ref,$_POST['IdMb'],$_POST['ObjMiss'],$_POST['LieuDép'],$_POST['MoyTrans'],$_POST['Départ'],$_POST['Retour'],$nbJours,$DateMiss,$_POST['TypeMiss'],$_POST['Accomp'],$_POST['Note'],"0");
+            if($mission->modifierMission()){
+                $historique=new Historique('Modification',date("d/m/20y H:i:s"),"Mission $ref");
+                if($historique->insertHistorique()){
+                    $_SESSION['success']="Mission modifiée avec succés ! ";
+                }
+                else{
+                    $_SESSION['erreur']="Erreur à la modification de la mission ! Veuillez réssayer. 1";
+                }
+            }
+            else{
+                $_SESSION['erreur']="Erreur à la modification de la mission ! Veuillez réssayer.2 ";
+            }
+        }catch(Exception | Error $e){
+            $_SESSION['erreur']="Erreur à la modification de la mission ! Veuillez réssayer. 3";
+        }
+        if(Membre::Admin()){
+            header("location:./admin/missions.php");
+        }
+        elseif(Membre::Collab()){
+            header("location:./collab/missions.php");
+        }
+    }
+    /*Archiver une mission*/
+    elseif(isset($_GET['archMiss']) && isset($_GET['IdMiss'])){
+        try{
+            $Date=date("20y/m/d h:m:s");
+            $ref=Mission::getRef($_GET['IdMiss']);
+            if(Mission::archiverMission($_GET['IdMiss'],$Date)){
+                $historique=new Historique('Archivage',$Date,"Mission $ref");
+                if($historique->insertHistorique()){
+                    $_SESSION['success']="Mission archivée avec succés ! ";
+                }
+                else{
+                    $_SESSION['erreur']="Erreur lors l'archivage de la mission ! Veuillez réssayer. ";
+                }
+            }
+            else{
+                $_SESSION['erreur']="Erreur lors l'archivage de la mission ! Veuillez réssayer. ";
+            }
+        }catch(Exception | Error $e){
+            $_SESSION['erreur']="Erreur lors l'archivage de la mission ! Veuillez réssayer. ";
+        }
+        header("location:./admin/missions.php?page=$_GET[page]");
+    }
+    /*Restaurer une mission*/
+    elseif(isset($_GET['restMiss']) && isset($_GET['IdMiss'])){
+        try{
+            $Date=date("20y/m/d h:m:s");
+            $ref=Mission::getRef($_GET['IdMiss']);
+            if(Mission::restaurerMission($_GET['IdMiss'])){
+                $historique=new Historique('Restauration',$Date,"Mission $ref");
+                if($historique->insertHistorique()){
+                    $_SESSION['success']="Mission restaurée avec succés ! ";
+                }
+                else{
+                    $_SESSION['erreur']="Erreur lors la restauration de la mission ! Veuillez réssayer. ";
+                }
+            }
+            else{
+                $_SESSION['erreur']="Erreur lors la restauration de la mission ! Veuillez réssayer. ";
+            }
+        }catch(Exception | Error $e){
+            $_SESSION['erreur']="Erreur lors la restauration de la mission ! Veuillez réssayer. ";
+        }
+        header("location:./admin/archives.php?page=$_GET[page]");
+    }
+    /*Supprimer une mission*/
+    elseif(isset($_GET['suppMiss']) && isset($_GET['IdMiss'])){
+        try{
+            $ref=Mission::getRef($_GET['IdMiss']);
+            if(Mission::supprimerMission($_GET['IdMiss'])){
+                $historique=new Historique('Suppression',$Date,"Mission $ref");
+                    if($historique->insertHistorique()){
+                        $_SESSION['success']="Mission supprimée avec succés ! ";
+                    }
+                    else{
+                        $_SESSION['erreur']="Erreur lors la suppression de la mission ! Veuillez réssayer. ";
+                    }
+            }
+            else{
+                $_SESSION['erreur']="Erreur lors la suppression de la mission ! Veuillez réssayer. ";
+            }
+        }
+        catch(Exception | Error $e){
+            $_SESSION['erreur']="Erreur lors la suppression de la mission ! Veuillez réssayer. ";
+        }
+        header("location:./admin/archives.php?page=$_GET[page]");
+    }
+    /*Valider une mission*/
+    elseif(isset($_GET['validerMiss'])){
+        $IdMiss=$_GET['IdMiss'];
+        $mission=Mission::getMissById($IdMiss);        
+        $DateMiss=explode(" ",$mission->getDateMiss());
+        $ref=$mission->getRéfMiss();
+        $membre=Membre::getById($mission->getIdMb());
+        $nom=$membre->getNom();
+        $prenom=$membre->getPrénom();
+        $LieuDép=$mission->getLieuDép();
+        $ObjMiss=$mission->getObjMiss();
+        $Départ=$mission->getDépart();
+        $Retour=$mission->getRetour();
+        {
+            $pdf = new PDF('P','mm','A4');
+            // Nouvelle page A4 (incluant ici logo, titre et pied de page)
+            $pdf->AddPage();
+            // Polices par défaut : Helvetica taille 9
+            $pdf->SetFont('Helvetica','',9);
+            // Couleur par défaut : noir
+            $pdf->SetTextColor(0);
+            $pdf->SetFont('Helvetica','',12);
+            $pdf->Text(10,75,iconv("UTF-8", "CP1252//TRANSLIT", "Réf : $ref"));
+            $pdf->Text(160,75,iconv("UTF-8", "CP1252//TRANSLIT", "Oujda le : $DateMiss[0]"));
+            $pdf->SetFont('Helvetica','b',20);
+            $pdf->Text(70,100,iconv("UTF-8", "CP1252//TRANSLIT", "ORDRE DE MISSION"));
+            $pdf->SetFont('Helvetica','b',12);
+            $pdf->Text(10,135,"Collaborateur : ");
+            $pdf->SetFont('Helvetica','',12);
+            $pdf->Text(70,135,"$prenom $nom");
+            $pdf->SetFont('Helvetica','b',12);
+            $pdf->Text(10,155,iconv("UTF-8", "CP1252//TRANSLIT", "Lieu de déplacement : "));
+            $pdf->SetFont('Helvetica','',12);
+            $pdf->Text(70,155,"$LieuDép");
+            $pdf->SetFont('Helvetica','b',12);
+            $pdf->Text(10,175,"Objet de la mission : ");
+            $pdf->SetFont('Helvetica','',12);
+            $pdf->Text(70,175,iconv("UTF-8", "CP1252//TRANSLIT","$ObjMiss"));
+            $pdf->SetFont('Helvetica','b',12);
+            $pdf->Text(10,195,iconv("UTF-8", "CP1252//TRANSLIT", "Date de départ : "));
+            $pdf->SetFont('Helvetica','',12);
+            $pdf->Text(70,195,"$Départ");
+            $pdf->SetFont('Helvetica','b',12);
+            $pdf->Text(120,195,"Date de retour : ");
+            $pdf->SetFont('Helvetica','',12);
+            $pdf->Text(180,195,"$Retour");
+            $pdf->Text(120,225,"Signature");
+            $pdf->Text(120,235,"Salah-dine KHLIFI");
+            $pdf->Output('F',"PDF/Ordre_Mission/Ordre_Mission_$IdMiss.pdf",true);
+        }
+        if(Mission::validerMission($IdMiss)){
+            $historique=new Historique('Validation',date("d/m/20y H:i:s"),"Mission $row[RéfMiss]");
+            if($historique->insertHistorique()){
+                $_SESSION['success']="Mission validée avec succés ! ";
+            }
+            else{
+                $_SESSION['erreur']="Erreur lors la validation de la mission ! Veuillez réssayer.";
             }
         }
         else{
-            echo "erreur";
+            $_SESSION['erreur']="Erreur lors la validation de la mission ! Veuillez réssayer.";
         }
+        header("location:./admin/missions.php?page=$_GET[page]");
     }
-    elseif(isset($_GET['validerMiss'])){
-        $IdMiss=$_GET['IdMiss'];
-        $con=\Tets\Oop\DataBase::connect();
-        $rslt=$con->query("select * from missions natural join membres where IdMiss=$IdMiss");
-        $row=$rslt->fetch();
-        $DateMiss=explode(" ",$row['DateMiss']);
-        $pdf = new PDF('P','mm','A4');
-        // Nouvelle page A4 (incluant ici logo, titre et pied de page)
-        $pdf->AddPage();
-        // Polices par défaut : Helvetica taille 9
-        $pdf->SetFont('Helvetica','',9);
-        // Couleur par défaut : noir
-        $pdf->SetTextColor(0);
-        $pdf->SetFont('Helvetica','',12);
-        $pdf->Text(10,75,iconv("UTF-8", "CP1250//TRANSLIT", "Réf : $row[RéfMiss]"));
-        $pdf->Text(160,75,iconv("UTF-8", "CP1250//TRANSLIT", "Oujda le : $DateMiss[0]"));
-        $pdf->SetFont('Helvetica','b',20);
-        $pdf->Text(70,100,iconv("UTF-8", "CP1250//TRANSLIT", "ORDRE DE MISSION"));
-        $pdf->SetFont('Helvetica','b',12);
-        $pdf->Text(10,135,"Collaborateur : ");
-        $pdf->SetFont('Helvetica','',12);
-        $pdf->Text(70,135,"$row[Prénom] $row[Nom]");
-        $pdf->SetFont('Helvetica','b',12);
-        $pdf->Text(10,155,iconv("UTF-8", "CP1250//TRANSLIT", "Lieu de déplacement : "));
-        $pdf->SetFont('Helvetica','',12);
-        $pdf->Text(70,155,"$row[LieuDép]");
-        $pdf->SetFont('Helvetica','b',12);
-        $pdf->Text(10,175,"Objet de la mission : ");
-        $pdf->SetFont('Helvetica','',12);
-        $pdf->Text(70,175,"$row[ObjMiss]");
-        $pdf->SetFont('Helvetica','b',12);
-        $pdf->Text(10,195,iconv("UTF-8", "CP1250//TRANSLIT", "Date de départ : "));
-        $pdf->SetFont('Helvetica','',12);
-        $pdf->Text(70,195,"$row[Départ]");
-        $pdf->SetFont('Helvetica','b',12);
-        $pdf->Text(120,195,"Date de retour : ");
-        $pdf->SetFont('Helvetica','',12);
-        $pdf->Text(180,195,"$row[Retour]");
-        $pdf->Text(120,225,"Signature");
-        $pdf->Text(120,235,"Salah-dine KHLIFI");
-        $pdf->Output('F',"PDF/Ordre_Mission/Ordre_Mission_$IdMiss.pdf",true);
-        \Tets\Oop\DataBase::updateData('missions',array(
-            "StatutMiss" => 1,
-            "OrdreMiss" => "Ordre_Mission_$IdMiss.pdf",
-        ),"IdMiss=$IdMiss");
-        if(DataBase::insertData("historique",array(
-            "TypeAction" => "Validation de mission",
-            "DateAction" => date("d/m/20y H:i:s"),
-            "ElementAction" => "$row[RéfMiss]",
-        ))){
-            $_SESSION['success']="Mission validée avec succés ! ";
-            header("location:./admin/missions.php?page=$_GET[page]");
-        }
-        else{
-            echo "erreur";
-        }
-
-    }
+    /*Valider le remboursement d'une mission*/
     elseif(isset($_POST['validerRemb']) ){
         $IdMiss=$_POST['IdMiss'];
         $Remb=$_POST['Remb'];
@@ -382,214 +460,275 @@
             $Description=$_POST['nomFile'];
             $typeFile=$_POST['typeFile'];
             for($i=0;$i<count($typeFile);$i++){
-                $row2=\Tets\Oop\DataBase::getDataWhere('frais',"IdFrais=$typeFile[$i]");
-                $Remb+=$row2[0]['MontantFrais'];
+                $Montant=Frais::getMontantFrais($typeFile[$i]);
+                $Remb+=$Montant;
                 $array=explode('.',$file['name'][$i]);
                 $ext=end($array);
                 $filename=time()."_img.$ext";
-                \Tets\Oop\DataBase::insertData('piècesjointes',array(
-                    "IdMiss" => $_POST['IdMiss'],
-                    "IdFrais" => $typeFile[$i],
-                    "DescriptionPJ" => $Description[$i],
-                    "NomPJ" => $filename
-                ));
-                $tmp_name = $file['tmp_name'][$i];
-                move_uploaded_file($tmp_name,"./PJ/$filename");
+                if(Mission::ajouterPièceJointe($_POST['IdMiss'],$typeFile[$i],$Description[$i],$filename)){
+                    $tmp_name = $file['tmp_name'][$i];
+                    move_uploaded_file($tmp_name,"./PJ/$filename");
+                }
             }
         }
-        $con=\Tets\Oop\DataBase::connect();
-        $rslt=$con->query("select * from missions natural join membres where IdMiss=$IdMiss");
-        $row=$rslt->fetch();
-        $IdMb=$row['IdMb'];
-        $rslt2=$con->query("select * from membres natural join groupes where IdMb=$IdMb");
-        $row2=$rslt2->fetch();
-        $DateFormat=explode("-",$row['Départ']);
+        $mission=Mission::getMissById($IdMiss);
+        $membre=Membre::getById($mission->getIdMb());
+        $groupe=Groupe::getGroupeById($membre->getGrp());
+        $Ref=$mission->getRéfMiss();
+        $IdMb=$mission->getIdMb();
+        $ObjMiss=$mission->getObjMiss();
+        $LieuDép=$mission->getLieuDép();
+        $nom=$membre->getNom();
+        $prenom=$membre->getPrénom();
+        $CIN=$membre->getCIN();
+        $Civilité=$membre->getTitreCivilité();
+        $Départ=$mission->getDépart();
+        $Retour=$mission->getRetour();
+        $DateFormat=explode("-",$Départ);
         $mois=mois($DateFormat[1]);
         $année=$DateFormat[2];
-        $Remb += $Remb *($row2['TauxG']/100);
-        \Tets\Oop\DataBase::updateData('missions',array(
-            "Montant" => $Remb,
-            "IdPaiement" => $_POST['Paiement'],
-            "DemandeRemb" => "Demande_Remboursement_$IdMiss.pdf",
-        ),"IdMiss=$IdMiss");
-        $rslt3=$con->query("select * from missions natural join paiement where IdMiss=$IdMiss");
-        $row3=$rslt3->fetch();
-        $lettre=new \Tets\Oop\ChiffreEnLettre();
+        $Remb += $Remb *($groupe->getTaux()/100);
+        if(Mission::validerRemb($IdMiss,$Remb,$_POST['Paiement'])){
+            $mission=Mission::getMissById($IdMiss);
+            $paiement=Mission::getTypePaiement($_POST['Paiement']);
+            if($historique=new Historique("Validation de remboursement",date("d/m/20y H:i:s"),"Mission $Ref")){
+                $_SESSION['success']="Remboursement validé avec succés ! ";
+            }
+            else{
+                $_SESSION['erreur']="Erreur lors la validation du remboursement ! Veuillez réssayer.";
+            }
+        }
+        {
+            $lettre=new ChiffreEnLettre();
             $pdf = new PDF('P','mm','A4');
             $pdf->AddPage();
             $pdf->SetFont('Helvetica','',9);
             $pdf->SetTextColor(0);
             $pdf->SetFont('Helvetica','',12);
-            $pdf->Text(10,75,iconv("UTF-8", "CP1250//TRANSLIT", "Réf : $row[RéfMiss]"));
-            $pdf->Text(160,75,iconv("UTF-8", "CP1250//TRANSLIT", "Oujda le : $Date"));
+            $pdf->Text(10,75,iconv("UTF-8", "CP1252//TRANSLIT", "Réf : $Ref"));
+            $pdf->Text(160,75,iconv("UTF-8", "CP1252//TRANSLIT", "Oujda le : $Date"));
             $pdf->SetFont('Helvetica','b',20);
-            $pdf->Text(27,100,iconv("UTF-8", "CP1250//TRANSLIT", "DEMANDE DE REMBOURSEMENT DES FRAIS"));
-            $pdf->Text(75,112,iconv("UTF-8", "CP1250//TRANSLIT", "DE DÉPLACEMENT"));
+            $pdf->Text(27,100,iconv("UTF-8", "CP1252//TRANSLIT", "DEMANDE DE REMBOURSEMENT DES FRAIS"));
+            $pdf->Text(75,112,iconv("UTF-8", "CP1252//TRANSLIT", "DE DÉPLACEMENT"));
             $pdf->SetFont('Helvetica','b',12);
             $pdf->Text(10,135,"Collaborateur : ");
             $pdf->SetFont('Helvetica','',12);
-            $pdf->Text(70,135,"$row[Nom] $row[Prénom]");
+            $pdf->Text(70,135,"$nom $prenom");
             $pdf->SetFont('Helvetica','b',12);
-            $pdf->Text(10,150,iconv("UTF-8", "CP1250//TRANSLIT", "Lieu de déplacement : "));
+            $pdf->Text(10,150,iconv("UTF-8", "CP1252//TRANSLIT", "Lieu de déplacement : "));
             $pdf->SetFont('Helvetica','',12);
-            $pdf->Text(70,150,"$row[LieuDép]");
+            $pdf->Text(70,150,"$LieuDép");
             $pdf->SetFont('Helvetica','b',12);
             $pdf->Text(10,165,"Objet de la mission : ");
             $pdf->SetFont('Helvetica','',12);
-            $pdf->Text(70,165,"$row[ObjMiss]");
+            $pdf->Text(70,165,iconv("UTF-8", "CP1252//TRANSLIT","$ObjMiss"));
             $pdf->SetFont('Helvetica','b',12);
-            $pdf->Text(10,180,iconv("UTF-8", "CP1250//TRANSLIT", "Date : "));
+            $pdf->Text(10,180,iconv("UTF-8", "CP1252//TRANSLIT", "Date : "));
             $pdf->SetFont('Helvetica','',12);
             $pdf->Text(70,180,"$Date");
             $pdf->SetFont('Helvetica','b',12);
             $pdf->Text(15,195,"*");
-            $pdf->Text(20,195,iconv("UTF-8", "CP1250//TRANSLIT", "Indemnités : "));
-            $pdf->Text(80,195,iconv("UTF-8", "CP1250//TRANSLIT", "$Remb DH"));
+            $pdf->Text(20,195,iconv("UTF-8", "CP1252//TRANSLIT", "Indemnités : "));
+            $pdf->Text(80,195,iconv("UTF-8", "CP1252//TRANSLIT", "$Remb DH"));
             $pdf->SetFont('Helvetica','',12);
             $pdf->SetXY(80,205);
-            $pdf->MultiCell(100,6,iconv("UTF-8", "CP1250//TRANSLIT", ucfirst($lettre->Conversion($Remb))." Dirhams"),0,1,0,false);
-            //$pdf->Text(90,205,iconv("UTF-8", "CP1250//TRANSLIT", "$text"));
+            $pdf->MultiCell(100,6,iconv("UTF-8", "CP1252//TRANSLIT", ucfirst($lettre->Conversion($Remb))." Dirhams"),0,1,0,false);
+            //$pdf->Text(90,205,iconv("UTF-8", "CP1252//TRANSLIT", "$text"));
             $pdf->Text(120,240,"Signature");
             $pdf->Text(120,250,"Salah-dine KHLIFI");
             $pdf->AddPage();
             $pdf->SetFont('Helvetica','',12);
-            $pdf->Text(10,75,iconv("UTF-8", "CP1250//TRANSLIT", "Réf : $row[RéfMiss]"));
-            $pdf->Text(160,75,iconv("UTF-8", "CP1250//TRANSLIT", "Oujda le : $Date"));
+            $pdf->Text(10,75,iconv("UTF-8", "CP1252//TRANSLIT", "Réf : $Ref"));
+            $pdf->Text(160,75,iconv("UTF-8", "CP1252//TRANSLIT", "Oujda le : $Date"));
             $pdf->SetFont('Helvetica','b',20);
-            $pdf->Text(88,100,iconv("UTF-8", "CP1250//TRANSLIT", "DECHARGE"));
+            $pdf->Text(88,100,iconv("UTF-8", "CP1252//TRANSLIT", "DECHARGE"));
             $pdf->SetFont('Helvetica','',12);
             $pdf->Ln('30');
             $pdf->SetX('10');
-            $pdf->MultiCell(200,9,iconv("UTF-8", "CP1250//TRANSLIT", "Je soussiné Mr. $row[Nom] $row[Prénom] titulaire de la CIN n° $row[CIN] reconnais avoir reçu de la société exen consulting sarl la somme de $Remb DH ".ucfirst($lettre->Conversion($Remb))." Dirhams par $row3[TypePaiement] au titre des remboursements de frais de mon deplacement à $row[LieuDép] durant le mois de $mois $année"),0,1,0,false);
-        $pdf->Output('F',"PDF/Demande_Remboursement/Demande_Remboursement_$IdMiss.pdf",true);
-        if(DataBase::insertData("historique",array(
-            "TypeAction" => "Validation de remboursement",
-            "DateAction" => date("d/m/20y H:i:s"),
-            "ElementAction" => "$row[RéfMiss]",
-        ))){
-            $_SESSION['success']="Remboursement validé avec succés ! ";
-            header("location:./admin/missions.php");
+            $pdf->MultiCell(190,9,iconv("UTF-8", "CP1252//TRANSLIT", "Je soussiné $Civilité $nom $prenom titulaire de la CIN n° $CIN reconnais avoir reçu de la société exen consulting sarl la somme de $Remb DH ".ucfirst($lettre->Conversion($Remb))."Dirhams par $paiement au titre des remboursements de frais de mon deplacement à $LieuDép durant le mois de $mois $année"),0,'J');
+            $pdf->Output('F',"PDF/Demande_Remboursement/Demande_Remboursement_$IdMiss.pdf",true);
         }
-        else{
-            echo "erreur";
-        }
-    }
-    elseif (isset($_POST['modifPJ'])) {
-        $files = $_FILES['file'];
-        $ids = $_POST['IdPJ'];
-
-        for ($i = 0; $i < count($ids); $i++) {
-            $array = explode('.', $files['name'][$i]);
-            $ext = end($array);
-            $filename = time() . "_img.$ext";
-            $id = $ids[$i];
-            \Tets\Oop\DataBase::updateData('piècesjointes', array(
-                "NomPJ" => $filename,
-            ), "IdPJ=$id");
-            $tmp_name = $files['tmp_name'][$i];
-            $destination = "./PJ/$filename";
-            move_uploaded_file($tmp_name, $destination);
-        }
-
         header("location:./admin/missions.php");
     }
-
-    elseif(isset($_GET['archMiss']) && isset($_GET['IdMiss'])){
-        $Date=date("20y/m/d h:m:s");
-        \Tets\Oop\DataBase::updateData('missions',array(
-            "DeletedAt" => $Date,
-        ),"IdMiss=$_GET[IdMiss]");
-        $_SESSION['success']="Mission archivée avec succés ! ";
-        header("location:./admin/missions.php?page=$_GET[page]");
+    //Traitement sue la table pièces jointes
+    /*Modifier une pièce jointe*/
+    elseif (isset($_POST['modifPJ'])) {
+        $file = $_FILES['file'];
+        $idPJ = $_POST['IdPJ'];
+        
+        $array = explode('.', $file['name']);
+        $ext = end($array);
+        $filename = time() . "_" . $idPJ . "_img.$ext";
+        
+        DataBase::updateData('piècesjointes', array(
+            "NomPJ" => $filename,
+        ), "IdPJ=$idPJ");
+        
+        $tmp_name = $file['tmp_name'];
+        $destination = "./PJ/$filename";
+        move_uploaded_file($tmp_name, $destination);
+        
+        echo json_encode(array('success' => true));
+        exit;
     }
-    elseif(isset($_GET['restMiss']) && isset($_GET['IdMiss'])){
-        $con=\Tets\Oop\DataBase::connect();
-        $rslt=$con->query("update missions set DeletedAt=DEFAULT where IdMiss=$_GET[IdMiss]");
-        $_SESSION['success']="Mission restaurée avec succés ! ";
-        header("location:./admin/archives.php?page=$_GET[page]");
-    }
-    elseif(isset($_GET['suppMiss']) && isset($_GET['IdMiss'])){
-        $row=DataBase::getDataWhere('missions',"IdMiss=$_GET[IdMiss]");
-        $ref=$row[0]['RéfMiss'];
-        if(\Tets\Oop\DataBase::deleteData('missions',"IdMiss=$_GET[IdMiss]")){
-            if(DataBase::insertData("historique",array(
-                "TypeAction" => "Suppression",
-                "DateAction" => date("d/m/20y H:i:s"),
-                "ElementAction" => "Missions $ref",
-            ))){
-                $_SESSION['success']="Mission supprimée avec succés ! ";
-                header("location:./admin/archives.php?page=$_GET[page]");            
+    //Traitements sur la table groupe
+    /*Ajouter un groupe*/
+    elseif (isset($_POST['ajtGroupe'])) {
+        $libelle = $_POST['Libellé'];
+        $tauxG = $_POST['TauxG'];
+        try{
+            $groupe=new Groupe('',$libelle, $tauxG);
+            if($groupe->ajouterGroupe()){
+                if($historique=new Historique("Ajout",date("d/m/20y H:i:s"),"Groupe $libelle")){
+                    $_SESSION['success'] = "Groupe ajouté avec succès !";
+                    header("Location:./admin/groupes.php");
+                }else{
+                    $_SESSION['erreur'] = "Erreur à l'ajout du groupe ! Veuillez réssayer.";
+                    header("Location:./admin/groupes.php");
+                }
             }
             else{
-                echo "erreur";
+                $_SESSION['erreur'] = "Erreur à l'ajout du groupe ! Veuillez réssayer.";
+                header("Location:./admin/groupes.php");
             }
         }
+        catch(Error | Exception $e){
+            $_SESSION['erreur'] = "Erreur à l'ajout du groupe ! Veuillez réssayer.";
+            header("Location:./admin/groupes.php");
+        }
+    }
+    /*Modifier un groupe*/
+    elseif (isset($_POST['modifGroupe'])) {
+        $IdG = $_POST['IdG'];
+        $Libellé = $_POST['Libellé'];
+        $taux = $_POST['TauxG'];
+        // Récupérer les anciennes valeurs du groupe
+        $ancienGroupe = Groupe::getGroupeById($idG);
+        $ancienLibelle = $ancienGroupe[0]['Libellé'];
+        $ancienTauxG = $ancienGroupe[0]['TauxG'];
+        // Vérifier si les données ont changé
+        try{
+            if ($libelle == $ancienLibelle && $tauxG == $ancienTauxG) {
+                $_SESSION['success'] = "Aucun changement détecté. Pas de mise à jour effectuée.";
+                header("Location: ./admin/groupes.php");
+            } 
+            else {
+                $groupe=new Groupe($IdG,$Libellé,$Taux);
+                if($groupe->modifierGroupe()){
+                    if($historique=new Historique("Ajout",date("d/m/20y H:i:s"),"Groupe $libelle")){
+                        $_SESSION['success'] = "Groupe modifié avec succès !";
+                        header("Location: ./admin/groupes.php");
+                    }else{
+                        $_SESSION['erreur'] = "Erreur à la modification du groupe ! Veuillez réssayer.";
+                        header("Location: ./admin/groupes.php");
+                    }
+                }
+                else{
+                    $_SESSION['erreur'] = "Erreur à la modification du groupe ! Veuillez réssayer.";
+                    header("Location: ./admin/groupes.php");
+                }
+            }
+        }
+        catch(Error | Exception $e){
+            $_SESSION['erreur'] = "Erreur à la modification du groupe ! Veuillez réssayer.";
+            header("Location: ./admin/groupes.php");
+        }
+    }
+    /*Supprimer une groupe*/
+    elseif (isset($_GET['suppGroupe']) && isset($_GET['IdG'])) {
+        $idG = $_GET['IdG'];
+        $page = $_GET['page'];
+        try{
+            if(Groupe::supprimerGroupe($idG, $page)){
+                $_SESSION['success'] = "Groupe supprimé avec succès !";
+                header("Location: ./admin/groupes.php?page=$page");
+            }
+            else{
+                $_SESSION['erreur'] = "Erreur à la suppression de groupe ! Veuillez réssayer.";
+                header("Location: ./admin/groupes.php?page=$page");
+            }
+        }
+        catch(Error | Exception $e){
+            $_SESSION['erreur'] = "Erreur à la suppression de groupe ! Veuillez réssayer.";
+            header("Location: ./admin/groupes.php?page=$page");
+        }
+    }
+    //Traitements sur la table Frais
+    /*Ajouter un frais*/
+    elseif (isset($_POST['ajtFrais'])) {
+        $libelleFrais = $_POST['LibelléFrais'];
+        $montantFrais = $_POST['MontantFrais'];
+        try{
+            if(Frais::vérifierLibellé($libelleFrais)){
+                $_SESSION['erreurAjt']=true;
+                $_SESSION['erreurLibelle'] = "Libellé existe déjà !";
+                header("Location: ./admin/frais.php");
+            }
+            else{
+                if(Frais::ajouterFrais($libelleFrais, $montantFrais)){
+                    $_SESSION['success'] = "Frais ajouté avec succès !";
+                    header("Location: ./admin/frais.php");
+                }
+                else{
+                    $_SESSION['erreur'] = "Erreur à la modification du frais ! Veuillez réssayer.";
+                    header("Location: ./admin/frais.php");
+                }
+            }
+        }
+        catch(Error | Exception $e){
+            $_SESSION['erreur'] = "Erreur à la modification du frais ! Veuillez réssayer.";
+            header("Location: ./admin/frais.php");
+        }
         
+    } 
+    /*Modifier un groupe*/
+    elseif (isset($_POST['modifFrais'])) {
+        $idFrais = $_POST['IdFrais'];
+        $libelleFrais = $_POST['LibelléFrais'];
+        $montantFrais = $_POST['MontantFrais'];
+        $ancienFrais=Frais::getFraisById($idFrais);
+        $ancienLibelle=$ancienFrais[0]['LibelléFrais'];
+        $ancienMontant=$ancienFrais[0]['MontantFrais'];
+        try{
+            if($libelleFrais == $ancienLibelle && $montantFrais == $ancienMontant){
+                $_SESSION['success'] = "Aucun changement détecté. Pas de mise à jour effectuée.";
+                header("Location: ./admin/frais.php");
+            }
+            else{
+                if(Frais::vérifierLibelléId($libelleFrais,$idFrais)){
+                    $_SESSION['erreurModif']=true;
+                    $_SESSION['erreurLibelle'] = "Libellé existe déjà !";
+                    header("Location: ./admin/frais.php");
+                }
+                else{
+                    if(Frais::modifierFrais($idFrais, $libelleFrais, $montantFrais)){
+                        $_SESSION['success'] = "Frais modifié avec succès !";
+                        header("Location: ./admin/frais.php");
+                    }
+                    else{
+                        $_SESSION['erreur'] = "Erreur à la modification du frais ! Veuillez réssayer .";
+                        header("Location: ./admin/frais.php");
+                    }
+                }
+                }
+        } catch(Exception | Error $e){
+            $_SESSION['erreur'] = "Erreur à la modification du frais ! Veuillez réssayer .";
+            header("Location: ./admin/frais.php");
+        }
+    } 
+    /*Supprimer un groupe*/
+    elseif (isset($_GET['suppFrais']) && isset($_GET['IdFrais'])) {
+        $idFrais = $_GET['IdFrais'];
+        $page = $_GET['page'];
+        if(Frais::supprimerFrais($idFrais, $page)){
+            $_SESSION['success'] = "Frais supprimé avec succès !";
+            header("Location: ./admin/frais.php?page=$page");
+        }
     }
-    elseif(isset($_POST['ajtGroupe'])){
-        $Libellé=$_POST['Libellé'];
-        $TauxG=$_POST['TauxG'];
-        DataBase::insertData('groupes',array(
-            "Libellé" => $Libellé,
-            "TauxG" => $TauxG,
-        ));
-        $_SESSION['success']="Groupe ajouté avec succés ! ";
-        header("location:./admin/groupes.php");
-    }
-    elseif(isset($_POST['modifGroupe'])){
-        $IdG=$_POST['IdG'];
-        $Libellé=$_POST['Libellé'];
-        $TauxG=$_POST['TauxG'];
-        DataBase::updateData('groupes',array(
-            "Libellé" => $Libellé,
-            "TauxG" => $TauxG,
-        ),"IdG=$IdG");
-        $_SESSION['success']="Groupe modifié avec succés ! ";
-        header("location:./admin/groupes.php");
-    }
-    elseif(isset($_GET['suppGroupe']) && isset($_GET['IdG'])){
-        \Tets\Oop\DataBase::deleteData('groupes',"IdG=$_GET[IdG]");
-        $_SESSION['success']="Groupe supprimée avec succés ! ";
-        header("location:./admin/groupes.php?page=$_GET[page]");
-    }
-    elseif(isset($_POST['ajtFrais'])){
-        $LibelléFrais=$_POST['LibelléFrais'];
-        $MontantFrais=$_POST['MontantFrais'];
-        DataBase::insertData('frais',array(
-            "LibelléFrais" => $LibelléFrais,
-            "MontantFrais" => $MontantFrais,
-        ));
-        $_SESSION['success']="Frais ajouté avec succés ! ";
-        header("location:./admin/frais.php");
-    }
-    elseif(isset($_POST['modifFrais'])){
-        $IdFrais=$_POST['IdFrais'];
-        $LibelléFrais=$_POST['LibelléFrais'];
-        $MontantFrais=$_POST['MontantFrais'];
-        DataBase::updateData('frais',array(
-            "LibelléFrais" => $LibelléFrais,
-            "MontantFrais" => $MontantFrais,
-        ),"IdFrais=$IdFrais");
-        $_SESSION['success']="frais modifié avec succés ! ";
-        header("location:./admin/frais.php");
-    }
-    elseif(isset($_POST['modifAdmin'])){
-        $id=$_SESSION['membre']['IdMb'];
-        DataBase::updateData('membres',array(
-            "Nom" => $_POST['Nom'],
-            "Prénom" =>$_POST['Prénom'],
-            "Email" =>$_POST['Email'],
-        ),"IdMb=$id");
-        $_SESSION['success']="Informations modifiées avec succès";
-        header("location:./admin/profil.php");
-    }
-    elseif(isset($_GET['suppFrais']) && isset($_GET['IdFrais'])){
-        \Tets\Oop\DataBase::deleteData('frais',"IdFrais=$_GET[IdFrais]");
-        $_SESSION['success']="Frais supprimée avec succés ! ";
-        header("location:./admin/frais.php?page=$_GET[page]");
-    }
+    //Traitement de sélection de données de la base de données
+    /*Selection des informations d'un collaborateur*/
     elseif(isset($_POST['IdMb']) && isset($_POST['getCollab'])){
-        $con=\Tets\Oop\DataBase::connect();
+        $con=DataBase::connect();
         $rslt=$con->query("select * from membres natural join groupes where IdMb=$_POST[IdMb]");
         $row=$rslt->fetch();
         $rslt2=$con->query("select * from missions where IdMb=$row[IdMb]");
@@ -598,6 +737,7 @@
         $infoCollab = array(
             'Nom' => $row['Nom'],
             'Prénom' => $row['Prénom'],
+            'TitreCivilité' => $row['TitreCivilité'],
             'IdG' => $row['IdG'],
             'Email' => $row['Email'],
             'CIN' => $row['CIN'],
@@ -606,8 +746,9 @@
         );
         echo json_encode($infoCollab);
     }
+    /*Selection des informations d'une mission*/
     elseif(isset($_POST['IdMiss']) && isset($_POST['getMiss'])){
-        $con=\Tets\Oop\DataBase::connect();
+        $con=DataBase::connect();
         $rslt=$con->query("select * from missions natural join membres where IdMiss=$_POST[IdMiss]");
         $row=$rslt->fetch();
         $infoMiss = array(
@@ -627,8 +768,9 @@
         );
         echo json_encode($infoMiss);
     }
+    /*Selection de tous les groupes / informations d'un groupe*/
     elseif (isset($_POST['getGroupes'])) {
-        $con = \Tets\Oop\DataBase::connect();
+        $con = DataBase::connect();
         if(isset($_POST['IdG'])){
             $rslt = $con->query("SELECT * FROM groupes where IdG=$_POST[IdG]");
         }
@@ -636,7 +778,6 @@
             $rslt = $con->query("SELECT * FROM groupes");
         }    
         $groupes = array();
-
         while ($row = $rslt->fetch()) {
             $groupes[] = array(
                 'IdG' => $row['IdG'],
@@ -644,11 +785,11 @@
                 'TauxG' => $row['TauxG'],
             );
         }
-
         echo json_encode($groupes);
     }
+    /*Selection de tous les frais / informations d'un frais*/
     elseif(isset($_GET['getFrais'])){
-        $con=\Tets\Oop\DataBase::connect();
+        $con=DataBase::connect();
         if(isset($_GET['IdFrais'])){
             $rslt=$con->query("select * from frais where IdFrais=$_GET[IdFrais]");
         }
@@ -669,8 +810,9 @@
         header('Content-Type: application/json');
         echo json_encode($options);
     }
+    /*Selection de toutes les missions effectuées par un collaborateur*/
     elseif(isset($_POST['getCollabMiss']) && isset($_POST['IdMb'])){
-        $con=\Tets\Oop\DataBase::connect();
+        $con=DataBase::connect();
         $rslt=$con->query("select * from missions natural join membres where IdMb=$_POST[IdMb]");
         $infoCollab = array();
         while ($row = $rslt->fetch()) {
@@ -685,6 +827,84 @@
         }
         echo json_encode($infoCollab);
     }
+    /*Selection de toutes les pièces jointes d'ne mission*/
+    elseif(isset($_POST['getMissPJ']) && isset($_POST['IdMiss'])){
+        $con=DataBase::connect();
+        $rslt=$con->query("select * from piècesjointes where IdMiss=$_POST[IdMiss]");
+        $infoMiss = array();
+        while ($row = $rslt->fetch()) {
+            $info = array(
+                'IdPJ' => $row['IdPJ'],
+                'NomPJ' => $row['NomPJ'],
+            );
+            $infoMiss[] = $info;
+        }
+        echo json_encode($infoMiss);
+    }
+    //Traitements de vérifications des informations déjà existante
+    /*Vérification de l'Email et CIN pour le formulaire de modification*/
+    elseif(isset($_POST['vérifEmailCinModif'])){
+        $response = array();
+        if (Membre::vérifCINlId($_POST['CIN'], $_POST['IdMb'])) {
+            $response['erreurCIN'] = "CIN déjà existant";
+        }
+        if (Membre::vérifEmailId($_POST['Email'], $_POST['IdMb'])) {
+            $response['erreurEmail'] = "Email déjà existant";
+        }
+        echo json_encode($response);
+    }
+    /*Vérification de l'Email et CIN pour le formulaire d'ajout'*/
+    elseif(isset($_POST['vérifEmailCinAjt'])){
+        $response = array();
+        if (Membre::vérifCIN($_POST['CIN'])) {
+            $response['erreurCIN'] = "CIN déjà existant";
+        }
+        if (Membre::vérifEmail($_POST['Email'])) {
+            $response['erreurEmail'] = "Email déjà existant";
+        }
+        echo json_encode($response);
+    }
+    /*Vérification de Libellé pour le formulaire d'ajout d'un groupe*/
+    elseif(isset($_POST['vérifLibelleGrp'])){
+        $response = array();
+        if(Groupe::vérifierLibellé($_POST['Libellé'])){
+            $response['erreurLibelle'] = "Libellé déjà existante";
+        }
+        echo json_encode($response);
+    }
+    /*Vérification de Libellé pour le formulaire de modification d'un groupe*/
+    elseif(isset($_POST['vérifLibelleGrpModif'])){
+        $response = array();
+        if(Groupe::vérifierLibelléId($_POST['Libellé'],$_POST['IdG'])){
+            $response['erreurLibelle'] = "Libellé déjà existante";
+        }
+        echo json_encode($response);
+    }
+    /*Vérification de Libellé pour le formulaire d'ajout d'un frais*/
+    elseif(isset($_POST['vérifLibelleFrais'])){
+        $response = array();
+        if(Frais::vérifierLibellé($_POST['Libellé'])){
+            $response['erreurLibelle'] = "Libellé déjà existante";
+        }
+        echo json_encode($response);
+    }
+    /*Vérification de Libellé pour le formulaire de modification d'un frais*/
+    elseif(isset($_POST['vérifLibelleFraisModif'])){
+        $response = array();
+        if(Frais::vérifierLibelléId($_POST['Libellé'],$_POST['IdFrais'])){
+            $response['erreurLibelle'] = "Libellé déjà existante";
+        }
+        echo json_encode($response);
+    }
+    /*Vérifictaion de mot de passe actuelle*/
+    if(isset($_POST['vérifMdps'])){
+        $IdMb=$_POST['IdMb'];
+        $Mdps=$_POST['Mdps'];
+        if(! Membre::vérifMdps($IdMb,$Mdps)){
+            echo "1";
+        }
+    }
+    //Traitement de déconnexion
     elseif(isset($_GET['décon'])){
         $_SESSION = array();
         setcookie(session_name(),' ', time()-1);

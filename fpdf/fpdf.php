@@ -1945,17 +1945,17 @@ class PDF extends FPDF
 		$this->Ln(25);
 		$this->SetFont('Helvetica','',9);
 		$this->SetX(75);
-		$this->Cell(60,8,iconv("UTF-8", "CP1250//TRANSLIT", "Sté Exen Consulting s.a.r.l"),0,1,'C',false);
+		$this->Cell(60,8,iconv("UTF-8", "CP1252//TRANSLIT", "Sté Exen Consulting s.a.r.l"),0,1,'C',false);
 		//$this->ln(20);
 		$this->SetX(75);
-		$this->Cell(60,8,iconv("UTF-8", "CP1250//TRANSLIT", "Angle Bd Zerktouni et Av Mohammed V 4 ème étage, Oujda"),0,1,'C',false);
+		$this->Cell(60,8,iconv("UTF-8", "CP1252//TRANSLIT", "Angle Bd Zerktouni et Av Mohammed V 4 ème étage, Oujda"),0,1,'C',false);
 		$this->SetX(75);
-		$this->Cell(60,8,iconv("UTF-8", "CP1250//TRANSLIT", "Tél: 00 212 05 36 68 45 45 - siteweb : www.exen.ma"),0,1,'C',false);
+		$this->Cell(60,8,iconv("UTF-8", "CP1252//TRANSLIT", "Tél: 00 212 05 36 68 45 45 - siteweb : www.exen.ma"),0,1,'C',false);
 		$this->Line(10,65,200,65);
 		$this->SetLineWidth(50);
 		$this->Ln(25);
-		//$this->Cell(60,8,iconv("UTF-8", "CP1250//TRANSLIT", "Tél: 00 212 05 36 68 45 45 - siteweb : www.exen.ma"),0,1,'C',false);
-		//$this->Cell(60,8,iconv("UTF-8", "CP1250//TRANSLIT", "Tél: 00 212 05 36 68 45 45 - siteweb : www.exen.ma"),0,1,'C',false);
+		//$this->Cell(60,8,iconv("UTF-8", "CP1252//TRANSLIT", "Tél: 00 212 05 36 68 45 45 - siteweb : www.exen.ma"),0,1,'C',false);
+		//$this->Cell(60,8,iconv("UTF-8", "CP1252//TRANSLIT", "Tél: 00 212 05 36 68 45 45 - siteweb : www.exen.ma"),0,1,'C',false);
 	}
 	// Footer
 	function Footer() {
