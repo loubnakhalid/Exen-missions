@@ -2,7 +2,6 @@
 
 namespace Tets\Oop;
 
-use mysql_xdevapi\Table;
 use PDO;
 
 class DataBase
@@ -11,8 +10,7 @@ class DataBase
     private const USER = 'root';
     private const PASS = '';
 
-    public static function connect():object
-    {
+    public static function connect():object{
         $con = new PDO(self::DSN, self::USER, self::PASS);
         return $con;
     }
@@ -57,3 +55,4 @@ class DataBase
         return $con->exec("DELETE FROM $table WHERE $where");
     }
 }
+?>

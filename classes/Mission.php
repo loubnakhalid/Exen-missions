@@ -111,10 +111,6 @@ class Mission
             "DemandeRemb" => "Demande_Remboursement_$IdMiss.pdf",
         ),"IdMiss=$IdMiss");
     }
-    public static function getTypePaiement($IdPaiement){
-        $row=DataBase::getDataWhere('paiement',"IdPaiement=$IdPaiement");
-        return $row[0]['TypePaiement'];
-    }
     public static function ajouterPièceJointe($IdMiss,$IdFrais,$Description,$filename){
         return DataBase::insertData('piècesjointes',array(
             "IdMiss" => $IdMiss,
@@ -158,6 +154,10 @@ class Mission
         $row=DataBase::getDataWhere('missions',"IdMiss=$IdMiss");
         $ref=$row[0]['RéfMiss'];
         return $ref;
+    }
+    public static function getTypePaiement($IdPaiement){
+        $row=DataBase::getDataWhere('paiement',"IdPaiement=$IdPaiement");
+        return $row[0]['TypePaiement'];
     }
     public static function getMissById($IdMiss){
         $row=DataBase::getDataWhere('missions',"IdMiss=$IdMiss");

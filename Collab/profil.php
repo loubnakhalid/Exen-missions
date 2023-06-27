@@ -30,15 +30,15 @@ $remb=Membre::countTotalRemb($_SESSION['membre']['IdMb']);
 								?>
 								<img class="rounded-circle img-fluid wid-120" style="width:172px" src="<?=$src?>" alt="User image">
 							</div>
-							<h5 class="mt-3"><?=$Nom.' '.$Prénom?></h5>
+							<h5 class="mt-3 gray"><?=$Nom.' '.$Prénom?></h5>
 							<p class="text-muted"><?=$Profil?></p>
 								<div class="row g-3 my-4">
 									<div class="col border border-top-0 border-bottom-0 border-start-0">
-										<h5 class="mb-0"><?=$missions?></h5>
+										<h5 class="mb-0 gray"><?=$missions?></h5>
 										<small class="text-muted">Missions effectuées</small>
 									</div>
 									<div class="col">
-										<h5 class="mb-0"><?=$remb?> DHS</h5>
+										<h5 class="mb-0 gray"><?=$remb?> DHS</h5>
 										<small class="text-muted">Total remboursement</small>
 									</div>
 								</div>
@@ -47,61 +47,67 @@ $remb=Membre::countTotalRemb($_SESSION['membre']['IdMb']);
 					</div>
 				</div>
 				<div class="col-md-8">
-					<form action="../controller.php" method="post">
-					<input type="hidden" value="<?=$_SESSION['membre']['IdMb']?>"  name="IdMb">
+					<form action="../controller.php" method="post" onsubmit="return vérifModifCollab()">
+					<input type="hidden" value="<?=$_SESSION['membre']['IdMb']?>" id="IdMb" name="IdMb">
 					<input type="hidden" value="<?=$Grp?>" name="IdG">
 						<div class="card" id="cardInfoPerson">
 							<div class="card-body">
 								<div class="row">
 									<div class="col-12">
-										<h5 style="display: inline;">Informations personnelles</h5>
+										<h5 style="display: inline;" class="gray">Informations personnelles</h5>
 										<a href="" id="linkModifInfo" class="link-secondary" style="float: right;">Modifier le mot de passe</a>
 										<hr class="mb-4">
 									</div>
 									<div class="col-sm-6">
 										<div class="form-group">
 											<label class="form-label">Nom</label>
-											<input type="text" name="Nom" class="form-control" value="<?=$Nom?>">
+											<input type="text" id="NomModif" name="Nom" class="form-control" value="<?=$Nom?>">
 										</div>
+										<div class="invalid-feedback" id="errNomModif" style="display: none;"></div>
 									</div>
 									<div class="col-sm-6">
 										<div class="form-group">
 											<label class="form-label">Prénom</label>
-											<input type="text" name="Prénom" class="form-control" value="<?=$Prénom?>">
+											<input type="text" name="Prénom" id="PrénomModif" class="form-control" value="<?=$Prénom?>">
+											<div class="invalid-feedback" id="errPrénomModif" style="display: none;"></div>
 										</div>
 									</div>
 									<div class="col-sm-6">
 										<div class="form-group mt-3">
 											<label class="form-label">CIN</label>
-											<input type="text" name="CIN" class="form-control" value="<?=$CIN?>">
+											<input type="text" id="CINModif" name="CIN" class="form-control" value="<?=$CIN?>">
+											<div class="invalid-feedback" id="errCINModif" style="display: none;"></div>
 										</div>
 									</div>
 									<div class="col-sm-6">
 										<div class="form-group mt-3">
 										<label class="form-label">Civilité</label>
-										<select class="form-select" name="TitreCivilité">
+										<select id="CivilitéModif" class="form-select" name="TitreCivilité">
 											<option value="M." <?php if ($TitreCivilité === 'M.') echo 'selected'; ?>>Monsieur</option>
 											<option value="Mme" <?php if ($TitreCivilité === 'Mme') echo 'selected'; ?>>Madame</option>
 											<option value="Mlle" <?php if ($TitreCivilité === 'Mlle') echo 'selected'; ?>>Mademoiselle</option>
 										</select>
+										<div class="invalid-feedback" id="errCivilitéModif" style="display: none;"></div>
 									</div>
 								</div>
 								<div class="col-sm-6">
 									<div class="form-group mt-3">
 										<label class="form-label">Email</label>
-										<input type="text" name="Email" class="form-control" value="<?=$Email?>" placeholder="Email">
+										<input type="text" id="EmailModif" name="Email" class="form-control" value="<?=$Email?>" placeholder="Email">
+										<div class="invalid-feedback" id="errEmailModif" style="display: none;"></div>
 									</div>
 								</div>
 								<div class="col-sm-6">
 									<div class="form-group mt-3">
 										<label class="form-label">Profil</label>
-										<input type="text" name="Profil" class="form-control" value="<?=$Profil?>" placeholder="Profil">
+										<input type="text" id="ProfileModif" name="Profil" class="form-control" value="<?=$Profil?>" placeholder="Profil">
+										<div class="invalid-feedback" id="errProfileModif" style="display: none;"></div>
 									</div>
 								</div>
 							</div>
 						</div>
 						<div class="card-footer text-end btn-page">
-							<span><button class="btn btn-outline-secondary"  type="reset">Annuler</button></span>
+							<span><button class="btn btn-outline-secondary"  type="reset" onclick="annulerVérifModifCollab()">Annuler</button></span>
 							<span><button class="btn btn-primary" name="modifCollab" type="submit">Enregistrer</button></span>
 						</div>
 					</form>
@@ -113,7 +119,7 @@ $remb=Membre::countTotalRemb($_SESSION['membre']['IdMb']);
 							<div class="card-body">
 								<div class="row">
 									<div class="col-12">
-										<h5 style="display: inline;">Modifier le mot de passe</h5>
+										<h5 style="display: inline;" class="gray">Modifier le mot de passe</h5>
 										<a href="" id="linkInfoPerso" class="link-secondary" style="float: right;">Modifier les informations personnelles</a>
 										<hr class="mb-4">
 									</div>
@@ -141,7 +147,7 @@ $remb=Membre::countTotalRemb($_SESSION['membre']['IdMb']);
 								</div>
 							</div>
 							<div class="card-footer text-end btn-page">
-								<span><button class="btn btn-outline-secondary"  type="reset">Annuler</button></span>
+								<span><button class="btn btn-outline-secondary"  type="reset" onclick="annulerVérifModifMdpsCollab()">Annuler</button></span>
 								<span><button class="btn btn-primary" name="modifMdpsCollab" type="submit">Enregistrer</button></span>
 							</div>
 						</div>

@@ -119,12 +119,14 @@
     }
     /*Modifier un collaborateur*/
     elseif (isset($_POST['modifCollab'])) {
-            $membre=new Membre($_POST['IdMb'],$_POST['Nom'],$_POST['Prénom'],$_POST['TitreCivilité'],$_POST['IdG'],$_POST['Email'],'',$_POST['CIN'],$_POST['Profil']);
-            if (isset($_POST['Mdps'])) {
-                $membre->setMdps(Membre::password_encrypt($_POST['Mdps']));
+            $con=DataBase::connect();
+            $rqt="update membres set Nom='$_POST[Nom]',Prénom='$_POST[Prénom]',TitreCivilité='$_POST[TitreCivilité]',IdG=$_POST[IdG],Email='$_POST[Email]',CIN='$_POST[CIN]',Profil='$_POST[Profil]' where IdMb=$_POST[IdMb]";
+            if (isset($_POST['Mdps']) && !empty($_POST['Mdps'])) {
+                $mdps=Membre::password_encrypt($_POST['Mdps']);
+                $rqt="update membres set Nom='$_POST[Nom]',Prénom='$_POST[Prénom]',TitreCivilité='$_POST[TitreCivilité]',IdG=$_POST[IdG],Email='$_POST[Email]',CIN='$_POST[CIN]',Profil='$_POST[Profil]',Mdps='$mdps' where IdMb=$_POST[IdMb]";
             }
-            if ($membre->modifierCollaborateur()) {
-                if(Membre::Admin()){
+            //$ancienMembre=Membre::getById($_POST['IdMb']);
+                    $con->exec($rqt);
                     $historique=new Historique('Modification',date("d/m/20y H:i:s"),"Collaborateur $_POST[IdMb]");
                     if($historique->insertHistorique()){
                         $_SESSION['success'] = "Collaborateur modifié avec succès !";
@@ -132,38 +134,33 @@
                     else{
                         $_SESSION['erreur']='Erreur lors de ma modification du collaborateur ! Veuillez réssayer.';
                     }
-                }
-                elseif(Membre::Collab()){
-                    $_SESSION['success'] = "Informations modifiées avec succès !";
+            if(Membre::Admin()){
+                header("location:./admin/collabs.php");
+            }
+            else{
+                header("location:./collab/profil.php");
+            }        
+        
+    }
+    elseif(isset($_GET['suppCollab']) && isset($_GET['IdMb'])){
+        $IdCollab = $_GET['IdMb'];
+        $page = $_GET['page'];
+        try{
+            if(Membre::delete($IdCollab)){
+                $historique=new Historique("Suppression",date("d/m/20y H:i:s"),"Collaborateur $IdCollab");
+                if($historique->insertHistorique()){
+                    $_SESSION['success'] = "Collaborateur supprimé avec succès !";
+                    header("Location: ./admin/groupes.php?page=$page");
                 }
             }
             else{
-                $_SESSION['erreur']='Erreur lors de ma modification du collaborateur ! Veuillez réssayer.';
+                $_SESSION['erreur'] = "Erreur à la suppression du collaborateur ! Veuillez réssayer.";
+                header("Location: ./admin/collabs.php?page=$page");
             }
-
-        /*if(Membre::Admin()){
-            header("location:./admin/collabs.php");
         }
-        elseif(Membre::Collab()){
-            header("location:./Collab/profil.php");
-
-        }*/
-    }
-    /*Supprimer un collaborateur*/
-    elseif (isset($_GET['suppCollab']) && isset($_GET['IdMb'])) {
-        if (Membre::delete($_GET['IdMb'])) {
-            $historique=new Historique('Suppression',date("d/m/20y H:i:s"),"Collaborateur $_GET[IdMb]");
-            if($historique->insertHistorique()){
-                $_SESSION['success'] = "Collaborateur supprimé avec succès !";
-                header("location:./admin/collabs.php?page=$_GET[page]");
-            }
-            else {
-                $_SESSION['erreur']='Erreur lors de la suppression du collaborateur ! Veuillez réssayer.';
-                header("location:./admin/collabs.php");
-            }
-        } else {
-            $_SESSION['erreur']='Erreur lors de la suppression du collaborateur ! Veuillez réssayer.';
-            header("location:./admin/collabs.php");
+        catch(Error | Exception $e){
+            $_SESSION['erreur'] = "Erreur à la suppression du collaborateur ! Veuillez réssayer.";
+            header("Location: ./admin/collabq.php?page=$page");
         }
     }
     /*Modifier les informations de l'administrateur*/
@@ -368,6 +365,7 @@
     elseif(isset($_GET['suppMiss']) && isset($_GET['IdMiss'])){
         try{
             $ref=Mission::getRef($_GET['IdMiss']);
+            $Date=date("20y/m/d h:m:s");
             if(Mission::supprimerMission($_GET['IdMiss'])){
                 $historique=new Historique('Suppression',$Date,"Mission $ref");
                     if($historique->insertHistorique()){
@@ -464,7 +462,7 @@
                 $Remb+=$Montant;
                 $array=explode('.',$file['name'][$i]);
                 $ext=end($array);
-                $filename=time()."_img.$ext";
+                $filename=(time()+$i)."_img.$ext";
                 if(Mission::ajouterPièceJointe($_POST['IdMiss'],$typeFile[$i],$Description[$i],$filename)){
                     $tmp_name = $file['tmp_name'][$i];
                     move_uploaded_file($tmp_name,"./PJ/$filename");
@@ -491,7 +489,8 @@
         if(Mission::validerRemb($IdMiss,$Remb,$_POST['Paiement'])){
             $mission=Mission::getMissById($IdMiss);
             $paiement=Mission::getTypePaiement($_POST['Paiement']);
-            if($historique=new Historique("Validation de remboursement",date("d/m/20y H:i:s"),"Mission $Ref")){
+            $historique=new Historique("Validation de remboursement",date("d/m/20y H:i:s"),"Mission $Ref");
+            if($historique->insertHistorique()){
                 $_SESSION['success']="Remboursement validé avec succés ! ";
             }
             else{
@@ -528,7 +527,7 @@
             $pdf->Text(70,180,"$Date");
             $pdf->SetFont('Helvetica','b',12);
             $pdf->Text(15,195,"*");
-            $pdf->Text(20,195,iconv("UTF-8", "CP1252//TRANSLIT", "Indemnités : "));
+            $pdf->Text(20,195,iconv("UTF-8", "CP1252//TRANSLIT", "Montant à rembourser : "));
             $pdf->Text(80,195,iconv("UTF-8", "CP1252//TRANSLIT", "$Remb DH"));
             $pdf->SetFont('Helvetica','',12);
             $pdf->SetXY(80,205);
@@ -579,7 +578,8 @@
         try{
             $groupe=new Groupe('',$libelle, $tauxG);
             if($groupe->ajouterGroupe()){
-                if($historique=new Historique("Ajout",date("d/m/20y H:i:s"),"Groupe $libelle")){
+                $historique=new Historique("Ajout",date("d/m/20y H:i:s"),"Groupe $libelle");
+                if($historique->insertHistorique()){
                     $_SESSION['success'] = "Groupe ajouté avec succès !";
                     header("Location:./admin/groupes.php");
                 }else{
@@ -603,19 +603,19 @@
         $Libellé = $_POST['Libellé'];
         $taux = $_POST['TauxG'];
         // Récupérer les anciennes valeurs du groupe
-        $ancienGroupe = Groupe::getGroupeById($idG);
-        $ancienLibelle = $ancienGroupe[0]['Libellé'];
-        $ancienTauxG = $ancienGroupe[0]['TauxG'];
+        $ancienGroupe = Groupe::getGroupeById($IdG);
+        $ancienLibelle = $ancienGroupe->getLibellé();
+        $ancienTauxG = $ancienGroupe->getTaux();
         // Vérifier si les données ont changé
         try{
-            if ($libelle == $ancienLibelle && $tauxG == $ancienTauxG) {
+            if ($Libellé == $ancienLibelle && $taux == $ancienTauxG) {
                 $_SESSION['success'] = "Aucun changement détecté. Pas de mise à jour effectuée.";
                 header("Location: ./admin/groupes.php");
             } 
             else {
-                $groupe=new Groupe($IdG,$Libellé,$Taux);
+                $groupe=new Groupe($IdG,$Libellé,$taux);
                 if($groupe->modifierGroupe()){
-                    if($historique=new Historique("Ajout",date("d/m/20y H:i:s"),"Groupe $libelle")){
+                    if($historique=new Historique("Ajout",date("d/m/20y H:i:s"),"Groupe $Libellé")){
                         $_SESSION['success'] = "Groupe modifié avec succès !";
                         header("Location: ./admin/groupes.php");
                     }else{
@@ -681,7 +681,7 @@
         }
         
     } 
-    /*Modifier un groupe*/
+    /*Modifier un frais*/
     elseif (isset($_POST['modifFrais'])) {
         $idFrais = $_POST['IdFrais'];
         $libelleFrais = $_POST['LibelléFrais'];
@@ -716,7 +716,7 @@
             header("Location: ./admin/frais.php");
         }
     } 
-    /*Supprimer un groupe*/
+    /*Supprimer un frais*/
     elseif (isset($_GET['suppFrais']) && isset($_GET['IdFrais'])) {
         $idFrais = $_GET['IdFrais'];
         $page = $_GET['page'];
@@ -813,7 +813,7 @@
     /*Selection de toutes les missions effectuées par un collaborateur*/
     elseif(isset($_POST['getCollabMiss']) && isset($_POST['IdMb'])){
         $con=DataBase::connect();
-        $rslt=$con->query("select * from missions natural join membres where IdMb=$_POST[IdMb]");
+        $rslt=$con->query("select * from missions natural join membres where IdMb=$_POST[IdMb] and deletedAt is null");
         $infoCollab = array();
         while ($row = $rslt->fetch()) {
             $info = array(
@@ -830,12 +830,13 @@
     /*Selection de toutes les pièces jointes d'ne mission*/
     elseif(isset($_POST['getMissPJ']) && isset($_POST['IdMiss'])){
         $con=DataBase::connect();
-        $rslt=$con->query("select * from piècesjointes where IdMiss=$_POST[IdMiss]");
+        $rslt=$con->query("select * from piècesjointes natural join frais where IdMiss=$_POST[IdMiss]");
         $infoMiss = array();
         while ($row = $rslt->fetch()) {
             $info = array(
                 'IdPJ' => $row['IdPJ'],
                 'NomPJ' => $row['NomPJ'],
+                'Frais' => $row['LibelléFrais'],
             );
             $infoMiss[] = $info;
         }
@@ -897,7 +898,7 @@
         echo json_encode($response);
     }
     /*Vérifictaion de mot de passe actuelle*/
-    if(isset($_POST['vérifMdps'])){
+    elseif(isset($_POST['vérifMdps'])){
         $IdMb=$_POST['IdMb'];
         $Mdps=$_POST['Mdps'];
         if(! Membre::vérifMdps($IdMb,$Mdps)){
@@ -916,5 +917,4 @@
         ));
         header("location:index.php");
     }
-
 ?>

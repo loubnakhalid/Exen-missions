@@ -137,8 +137,8 @@
                         </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal" style="width: 72px;height: 36px;">Fermer</button>
-                    <button type="submit" name="ajtFrais" class="btn btn-primary" style="width: 145px;height: 36px;">Enregistrer</button>
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Fermer</button>
+                    <button type="submit" name="ajtFrais" class="btn btnSub">Enregistrer</button>
                 </div>
                 </form>
             </div>
@@ -171,8 +171,8 @@
                         </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal" style="width: 72px;height: 36px;">Fermer</button>
-                    <button type="submit" name="modifFrais" class="btn btn-primary" style="width: 145px;height: 36px;">Enregistrer</button>
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Fermer</button>
+                    <button type="submit" name="modifFrais" class="btn btnSub">Enregistrer</button>
                 </div>
                 </form>
             </div>

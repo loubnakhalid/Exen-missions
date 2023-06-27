@@ -53,7 +53,7 @@
                 <table id="tableMission" cellspacing='0'>
                     <thead>
                         <tr>
-                            <th>#</th>
+                            <th style="width:31.2188px">#</th>
                             <th>Réf</th>
                             <th>Collaborateur</th>
                             <th>Objet</th>
@@ -62,7 +62,7 @@
                             <th>Départ</th>
                             <th>Retour</th>
                             <th>Durée</th>
-                            <th>Nuité</th>
+                            <th>Nuitées</th>
                             <th>Date mission</th>
                             <th>Pièces</th>
                             <th style="width:100.3906px"><i class="fa-solid fa-gear" style="color: #5a5a5a;"></i></th>
@@ -110,7 +110,7 @@
                                 $demandeRembClass="dropdown-item";
                             }
                             elseif($row['StatutMiss']==0){
-                                $class="btn btn-secondary btn-sm dropdown-toggle red";
+                                $class="btn btn-sm dropdown-toggle red";
                                 $modifClass="dropdown-item icnModifMiss";
                                 $validClass="dropdown-item";
                                 $validRembClass="dropdown-item disabled";
@@ -118,7 +118,7 @@
                                 $demandeRembClass="dropdown-item disabled";
                             }
                             else{
-                                $class="btn btn-secondary btn-sm dropdown-toggle green";
+                                $class="btn btn-sm dropdown-toggle green";
                                 $modifClass="dropdown-item disabled";
                                 $validClass="dropdown-item disabled";
                                 if($row['Montant']==NULL){
@@ -265,8 +265,8 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal" style="width: 72px;height: 36px;">Fermer</button>
-                        <button type="submit" name="ajtMiss" class="btn btn-primary" style="width: 145px;background-color: #69c1ec !important;border-color: #69c1ec !important;height: 36px;">Ajouter</button>
+                        <button type="button" class="btn btn-outline-secondary" data-dismiss="modal" style="width: 72px;height: 36px;">Fermer</button>
+                        <button type="submit" name="ajtMiss" class="btn btnSub">Ajouter</button>
                     </div>
                 </form>
             </div>
@@ -341,8 +341,8 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal" style="width: 72px;height: 36px;" onclick="history.back()">Fermer</button>
-                        <button type="submit" name="modifMiss" class="btn btn-primary" style="width: 145px;background-color: #69c1ec !important;border-color: #69c1ec !important;height: 36px;">Modifier</button>
+                        <button type="button" class="btn btn-outline-secondary" data-dismiss="modal" style="width: 72px;height: 36px;" onclick="history.back()">Fermer</button>
+                        <button type="submit" name="modifMiss" class="btn btnSub" style="width: 145px;">Modifier</button>
                     </div>
                 </form>
             </div>
@@ -482,8 +482,8 @@
                             </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal" style="width: 72px;height: 36px;">Fermer</button>
-                    <button type="submit" name="validerRemb" class="btn btn-primary" style="width: 145px;height: 36px;" onclick='document.getElementById("montant-rembourser").enabled="enabled";'>Enregistrer</button>
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal" style="width: 72px;height: 36px;">Fermer</button>
+                    <button type="submit" name="validerRemb" class="btn btnSub" onclick='document.getElementById("montant-rembourser").enabled="enabled";'>Enregistrer</button>
                 </div>
                 </form>
             </div>

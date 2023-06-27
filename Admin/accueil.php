@@ -24,7 +24,7 @@
             <div class="card-body">
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-info mb-1"  style="font-size: 19px;"> 
+                        <div class="text-xs font-weight-bold text-info mb-1 cardAccueil"> 
                             Collaborateurs</div>
                         <div class="h5 mb-0 font-weight-bold gray"><?=$rslt4?></div>
                     </div>
@@ -41,7 +41,7 @@
             <div class="card-body">
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-primary mb-1" style="font-size: 19px;" >
+                        <div class="text-xs font-weight-bold text-primary mb-1 cardAccueil">
                             Missions effectuées</div>
                         <div class="h5 mb-0 font-weight-bold gray"><?=$rslt1?></div>
                     </div>
@@ -58,7 +58,7 @@
             <div class="card-body">
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-warning mb-1" style="font-size: 19px;"> Missions non remboursées
+                        <div class="text-xs font-weight-bold text-warning mb-1 cardAccueil"> Missions non remboursées
                         </div>
                         <div class="row no-gutters align-items-center">
                             <div class="col-auto">
@@ -76,10 +76,10 @@
             <div class="card-body">
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                        <div class="text-xs font-weight-bold greenText mb-1"  style="font-size: 19px;"> Total remboursement</div>
+                        <div class="text-xs font-weight-bold greenText mb-1 cardAccueil" > Total remboursements</div>
                         <div class="h5 mb-0 font-weight-bold gray"><?=$total?> DHS</div>
                     </div>
-                    <div class="col-auto gray">
+                    <div class="col-auto gray" style="padding-left:0">
                         <i class="fas fa-dollar-sign fa-2x" aria-hidden="true"></i>
                     </div>
                 </div>
@@ -152,17 +152,18 @@
     $missionsByMonth = array_fill(0, 12, 0);
 
     // Parcourir les données des missions
-    foreach ($row as $mission) {
-        $dateMiss = $mission['DateMiss'];
-        $div=substr($dateMiss,0,10);
-        $date = explode("/", $div, 3);
-        $year = $date[2];
-        if ($year == $currentYear) {
-            $month = (int)$date[1]; // Récupère le mois (1 pour janvier, 2 pour février, etc.)
-            $missionsByMonth[$month - 1]++; // Incrémente le compteur pour le mois correspondant
+    if($row){
+        foreach ($row as $mission) {
+            $dateMiss = $mission['DateMiss'];
+            $div=substr($dateMiss,0,10);
+            $date = explode("/", $div, 3);
+            $year = $date[2];
+            if ($year == $currentYear) {
+                $month = (int)$date[1]; // Récupère le mois (1 pour janvier, 2 pour février, etc.)
+                $missionsByMonth[$month - 1]++; // Incrémente le compteur pour le mois correspondant
+            }
         }
     }
-    //print_r($missionsByMonth);
 ?>
 
 <script>
@@ -190,7 +191,7 @@
         data: {
             labels: monthLabels,
             datasets: [{
-                label: "Missions effectuées",
+                label: "Missions effectuées en <?php echo $year ;?>",
                 data: missionsByMonth,
                 backgroundColor: "#8ec6ff"
             }]
@@ -201,21 +202,25 @@
 <?php
     $rowMembers = DataBase::getDataWhere('membres', 'Statut <> 1');
     $con=DataBase::connect();
-    $rslt=$con->query("select * from missions natural join membres where Statut <> 1 and DeletedAt is null");
+    $rslt=$con->query("SELECT membres.IdMb, membres.Nom, COUNT(missions.IdMiss) AS NbMissions FROM missions NATURAL JOIN membres WHERE membres.Statut <> 1 AND missions.DeletedAt IS NULL GROUP BY membres.IdMb");
     $rowMissions=$rslt->fetchAll();
     $missionsByCollaborator = array();
 
     // Parcourir les membres pour initialiser le tableau avec des compteurs à zéro
-    foreach ($rowMembers as $member) {
-        $memberId = $member['IdMb'];
-        $missionsByCollaborator[$memberId] = 0;
+    if($rowMembers){
+        foreach ($rowMembers as $member) {
+            $memberId = $member['IdMb'];
+            $missionsByCollaborator[$memberId] = 0;
+        }
     }
 
     // Parcourir les missions et incrémenter les compteurs correspondants
-    foreach ($rowMissions as $mission) {
-        $memberId = $mission['IdMb'];
-        if (isset($missionsByCollaborator[$memberId])) {
-            $missionsByCollaborator[$memberId]++;
+    if ($rowMissions) {
+        foreach ($rowMissions as $mission) {
+            $memberId = $mission['IdMb'];
+            if (isset($missionsByCollaborator[$memberId])) {
+                $missionsByCollaborator[$memberId] += intval($mission['NbMissions']);
+            }
         }
     }
 ?>
@@ -225,12 +230,8 @@
     const missionsByCollaborator = <?php echo json_encode($missionsByCollaborator); ?>;
 
     // Récupérer les noms des collaborateurs à partir des données des membres
-    const memberNames = <?php echo json_encode(array_map(function($member) {
-        return $member['Nom'] . ' ' . $member['Prénom'];}, $rowMembers)); ?>;
-    // Générer les labels et les données du graphique
-    const collaboratorLabels = memberNames;
-    const missionCounts = Object.values(missionsByCollaborator);
-    missionCounts.sort((a, b) => b - a);
+    const collaboratorLabels = <?php echo json_encode(array_column($rowMembers, 'Nom')); ?>;
+const missionCounts = <?php echo json_encode(array_values($missionsByCollaborator)); ?>;
     // Configurer le graphique avec les labels et les données
     let ctx2 = document.getElementById("chart2").getContext("2d");
     let myChart2 = new Chart(ctx2, {
@@ -263,16 +264,21 @@
     $missionsByGroupe = array();
 
     // Parcourir les groupes pour initialiser le tableau avec des compteurs à zéro
-    foreach ($rowGroupes as $groupe) {
-        $groupeId = $groupe['IdG'];
-        $missionsByGroupe[$groupeId] = 0;
+    if($rowGroupes){
+        foreach ($rowGroupes as $groupe) {
+            $groupeId = $groupe['IdG'];
+            $missionsByGroupe[$groupeId] = 0;
+        }
     }
 
+
     // Parcourir les missions et incrémenter les compteurs correspondants
-    foreach ($rowMissions as $mission) {
-        $groupeId = $mission['IdG'];
-        if (isset($missionsByGroupe[$groupeId])) {
-            $missionsByGroupe[$groupeId]++;
+    if($rowMissions){
+        foreach ($rowMissions as $mission) {
+            $groupeId = $mission['IdG'];
+            if (isset($missionsByGroupe[$groupeId])) {
+                $missionsByGroupe[$groupeId]++;
+            }
         }
     }
 ?>
@@ -317,17 +323,22 @@
     $remboursementsByCollaborator = array();
 
     // Parcourir les membres pour initialiser le tableau avec des montants à zéro
-    foreach ($rowMembers as $member) {
-        $memberId = $member['IdMb'];
-        $remboursementsByCollaborator[$memberId] = 0;
+    if($rowMembers){
+        foreach ($rowMembers as $member) {
+            $memberId = $member['IdMb'];
+            $remboursementsByCollaborator[$memberId] = 0;
+        }
     }
 
+
     // Parcourir les missions et calculer la somme des montants remboursés par collaborateur
-    foreach ($rowMissions as $mission) {
-        $memberId = $mission['IdMb'];
-        $montantRembourse = $mission['Montant'];
-        if (isset($remboursementsByCollaborator[$memberId])) {
-            $remboursementsByCollaborator[$memberId] += $montantRembourse;
+    if($rowMissions){
+        foreach ($rowMissions as $mission) {
+            $memberId = $mission['IdMb'];
+            $montantRembourse = $mission['Montant'];
+            if (isset($remboursementsByCollaborator[$memberId])) {
+                $remboursementsByCollaborator[$memberId] += $montantRembourse;
+            }
         }
     }
 ?>
@@ -338,7 +349,7 @@
 
     // Récupérer les noms des collaborateurs à partir des données des membres
     const memberNames2 = <?php echo json_encode(array_map(function($member) {
-        return $member['Nom'] . ' ' . $member['Prénom'];}, $rowMembers)); ?>;
+        return $member['Nom'];}, $rowMembers)); ?>;
 
     // Générer les labels et les données du graphique
     const collaboratorLabels1 = memberNames2;

@@ -155,6 +155,28 @@ function vérifAjtCollab() {
     return aide;
 }
 
+function annulerVérifModifCollab() {
+    var Nom = document.getElementById("NomModif");
+    var Prénom = document.getElementById("PrénomModif");
+    var Email = document.getElementById("EmailModif");
+    var Profile = document.getElementById("ProfileModif");
+    var CIN = document.getElementById("CINModif");
+    var Civilité = document.getElementById('CivilitéModif');
+    var array = [Nom, Prénom, Email, Profile, CIN, Civilité];
+    var aide = true;
+
+    for (let input of array) {
+        if (input.classList.contains('is-invalid')) {
+            input.classList.remove('is-invalid');
+        }
+    }
+
+    for (let input of array) {
+        document.getElementById("err" + input.id).innerHTML = "";
+    }
+
+}
+
 function vérifModifCollab() {
     var IdMb = document.getElementById("IdMb").value;
     var Nom = document.getElementById("NomModif");
@@ -762,4 +784,24 @@ function vérifModifMdpsCollab() {
     }
 
     return aide;
+}
+
+function annulerVérifModifMdpsCollab() {
+    var passwordActuelle = document.getElementById("PasswordActuelle");
+    var newPassword = document.getElementById("NewPassword");
+    var confirmNewPassword = document.getElementById("ConfirmNewPassword");
+    var errPasswordActuelle = document.getElementById("errPasswordActuelle");
+    var errNewPassword = document.getElementById("errNewPassword");
+    var errConfirmNewPassword = document.getElementById("errConfirmNewPassword");
+    var arrayInput = [passwordActuelle, newPassword, confirmNewPassword];
+    var arrayErr = [errPasswordActuelle, errNewPassword, errConfirmNewPassword];
+    var aide = true;
+    for (let input of arrayInput) {
+        if (input.classList.contains('is-invalid')) {
+            input.classList.remove('is-invalid');
+        }
+    }
+    for (let input of arrayErr) {
+        input.innerHTML = "";
+    }
 }

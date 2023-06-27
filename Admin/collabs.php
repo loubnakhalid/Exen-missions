@@ -66,7 +66,7 @@
                     <?php
                     foreach ($row as $row) {
                         $con=\Tets\Oop\DataBase::connect();
-                        $rslt=$con->query("select * from missions where IdMb=$row[IdMb]");
+                        $rslt=$con->query("select * from missions where IdMb=$row[IdMb] and deletedAt is null");
                         $nbrMiss=$rslt->rowCount();
                         if($nbrMiss != 0){
                             $style="<button class='collabMiss btnPJ'  data-id='$row[IdMb]' data-toggle='modal' data-target='#collabMiss'>$nbrMiss</button>";
@@ -210,8 +210,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal" style="width: 72px;height: 36px;">Fermer</button>
-                    <button type="submit" name="ajtCollab" value="Ajouter" class="btn btn-primary" style="width: 145px;background-color: #69c1ec !important;border-color: #69c1ec !important;height: 36px;">Ajouter</button>
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Fermer</button>
+                    <button type="submit" name="ajtCollab" value="Ajouter" class="btn btnSub">Ajouter</button>
                 </div>
             </form>
             </div>
@@ -289,8 +289,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal" style="width: 72px;height: 36px;">Fermer</button>
-                    <button type="submit" name="modifCollab" class="btn btn-primary" style="width: 145px;background-color: #69c1ec !important;border-color: #69c1ec !important;height: 36px;">Modifier</button>
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal" style="width: 72px;height: 36px;">Fermer</button>
+                    <button type="submit" name="modifCollab" class="btn btnSub" style="width: 145px;background-color: #69c1ec !important;border-color: #69c1ec !important;height: 36px;">Modifier</button>
                 </div>
                 </form>
             </div>
@@ -376,66 +376,6 @@
             </div>
         </div>
     </div>
-
-<?php 
-    //Traitement d'email ou CIN existants
-    if(isset($_SESSION['erreurEmail']) || isset($_SESSION['erreurCIN'])){
-        if(isset($_SESSION['erreurEmail'])){
-            if(isset($_SESSION['erreurAjt'])){
-                echo "<script>document.getElementById('btnAjtCollab').click();</script>";
-                echo "
-                <script>
-                    var Email = document.getElementById('EmailAjt');
-                    Email.classList+=' is-invalid';
-                    var err=document.getElementById('errEmailAjt'); 
-                    err.style.display='block'; 
-                    err.innerHTML='$_SESSION[erreurEmail]';
-                </script>
-                ";
-            }
-            elseif(isset($_SESSION['erreurModif'])){
-                echo "<script>document.getElementById('btnModifCollab').click();</script>";
-                echo "
-                <script>
-                    var Email = document.getElementById('EmailModif');
-                    Email.classList+=' is-invalid';
-                    var err=document.getElementById('errEmailModif'); 
-                    err.style.display='block'; 
-                    err.innerHTML='$_SESSION[erreurEmail]';
-                </script>
-                ";
-            }
-            unset($_SESSION["erreurEmail"]);
-        }
-        if(isset($_SESSION['erreurCIN'])){
-            if(isset($_SESSION['erreurAjt'])){
-                echo "<script>document.getElementById('btnAjtCollab').click();</script>";
-                echo "
-                <script>
-                    var CIN = document.getElementById('CINAjt');
-                    CIN.classList+=' is-invalid';
-                    var err=document.getElementById('errCINAjt'); 
-                    err.style.display='block'; 
-                    err.innerHTML='$_SESSION[erreurCIN]';
-                </script>
-                ";
-            }
-            elseif(isset($_SESSION['erreurModif'])){
-                echo "<script>document.getElementById('btnModifCollab').click();</script>";
-                echo "
-                <script>
-                    var CIN = document.getElementById('CINModif');
-                    CIN.classList+=' is-invalid';
-                    var err=document.getElementById('errCINModif'); 
-                    err.style.display='block'; 
-                    err.innerHTML='$_SESSION[erreurCIN]';
-                </script>
-                ";
-            }
-            unset($_SESSION["erreurCIN"]);
-        }
-    }
-?>
 
 <?php
     include "./inc/footer.php";

@@ -31,7 +31,8 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.2/Chart.min.js"></script>
     <script src="../inc/js/functions.js"></script>
-    <title>Document</title>
+    <title>GRH_Exen</title>
+    <link rel="icon" href="../inc/img/logoB.svg">
 </head>
 <body>
   <header>
@@ -42,23 +43,25 @@
       <a  class="navbar-brand navbar-collab" href="index.html">
           <img src="../inc/img/logoB.svg" alt="" loading="lazy" style="width:75px">
       </a>
-      <!-- Container wrapper -->
-        <!-- Toggle button -->
-
-        <!-- Right links -->
-        <ul class="navbar-nav ms-auto d-flex flex-row">
-
-          <!-- Avatar -->
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle hidden-arrow d-flex align-items-center" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              Bonjour <?= $_SESSION['membre']['Prénom'] ?>
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
-              <li><a class="dropdown-item" href="./profil.php">Profil</a></li>
-              <li><a class="dropdown-item" href="../controller.php?décon">Déconnexion</a></li>
+        <div class="collapse navbar-collapse" id="navbarColor01">
+            <ul class="navbar-nav me-auto" id="ulNavCollab">
+                <li class="nav-item" style="margin-right: 30px;">
+                    <a class="nav-link" href="profil.php">
+                      <i class="fa-solid fa-user"></i> Mon Profil
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="missions.php">                    
+                      <i class="fas fa-clipboard-list gray" aria-hidden="true"></i> Missions effectuées
+                    </a>
+                </li>
             </ul>
-          </li>
-        </ul>
+            <div class='d-flex'>
+              <a class="nav-link gray" href="../controller.php?décon">
+              <i class="fa-solid fa-right-from-bracket"></i> Déconnexion
+              </a>
+            </div>
+        </div>
       </div>
       <!-- Container wrapper -->
     </nav>

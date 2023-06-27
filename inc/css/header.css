@@ -5,8 +5,36 @@ body {
     color: #5a5a5a!important;
 }
 
+.dropdown-item {
+    font-size: 14px !important;
+}
+
+.cardAccueil {
+    font-size: 16px !important;
+}
+
+#ulNavCollab {
+    position: relative;
+    left: 350px;
+}
+
 .odd {
     background-color: #f8f8f8 !important;
+}
+
+.btnSub {
+    width: 145px;
+    background-color: #1e8af7 !important;
+    color: white !important;
+}
+
+h4,
+h5 {
+    color: #80bfff !important;
+}
+
+.pagination {
+    float: right;
 }
 
 @media (min-width: 991.98px) {
@@ -15,9 +43,18 @@ body {
     }
 }
 
+.modal-dialog {
+    max-width: 707px !important;
+}
+
 .navbar {
     left: 240px !important;
     box-shadow: 0 2px 5px 0 rgb(0 0 0 / 5%), 0 2px 10px 0 rgb(0 0 0 / 5%);
+}
+
+.action .dropdown-toggle {
+    width: 48px;
+    padding: 1px !important;
 }
 
 .navbar-brand {
@@ -104,13 +141,13 @@ h1 {
     top: 3px;
     width: 100%;
     transition: all 0.8s ease;
-    /*overflow: visible !important;*/
+    overflow: visible !important;
     position: relative;
 }
 
 table {
     gap: 60px;
-    /* overflow: visible; */
+    overflow: visible;
     border: 1px solid #e2e2e2;
     overflow-y: auto;
     width: 100%;
@@ -128,7 +165,7 @@ tr {
 th,
 td {
     /*background: #ddd !important;*/
-    padding-left: 10px !important;
+    /* padding-left: 10px !important; */
 }
 
 table thead {
@@ -149,7 +186,7 @@ table td {
     height: 50px;
     background-color: inherit;
     text-align: center;
-    padding-left: 10px;
+    /* padding-left: 10px; */
     font-size: 12px;
     color: rgb(69, 87, 106);
 }
@@ -219,6 +256,7 @@ table td.action input {
 
 .green {
     background-color: #3ec93e !important;
+    color: white !important;
 }
 
 .blue {
@@ -227,6 +265,7 @@ table td.action input {
 
 .red {
     background-color: #ff5252 !important;
+    color: white !important;
 }
 
 .left::after {
@@ -245,6 +284,7 @@ table td.action input {
     border: none;
     padding: 4px;
     border-radius: 3px;
+    font-size: 14px;
     color: rgb(69, 87, 106) !important;
     outline: none !important;
 }
@@ -253,7 +293,7 @@ table td.action input {
     height: 50px;
     background-color: inherit;
     text-align: center;
-    font-size: 13px;
+    font-size: 12px;
     color: rgb(69, 87, 106);
     border: 1px solid rgb(235 235 235);
     border-radius: 4px;
@@ -320,22 +360,22 @@ table td.action input {
     z-index: 2;
 }
 
-::-webkit-scrollbar {
+ ::-webkit-scrollbar {
     width: 20px;
 }
 
-::-webkit-scrollbar-track {
+ ::-webkit-scrollbar-track {
     background-color: transparent;
 }
 
-::-webkit-scrollbar-thumb {
+ ::-webkit-scrollbar-thumb {
     background-color: #d6dee1;
     border-radius: 20px;
     border: 6px solid transparent;
     background-clip: content-box;
 }
 
-::-webkit-scrollbar-thumb:hover {
+ ::-webkit-scrollbar-thumb:hover {
     background-color: #a8bbbf;
 }
 
@@ -368,6 +408,7 @@ label {
     padding: 5px 2px !important;
     height: auto;
     font-size: 16px !important;
+    background-color: #1e8af7 !important;
 }
 
 .form-control {

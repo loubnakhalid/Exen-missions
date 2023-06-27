@@ -1,3 +1,4 @@
+
 $(document).ready(function() {
     $('button[data-target="#formPJ"]').on('click', function() {
         var missionId = $(this).data('id');
@@ -11,7 +12,7 @@ $(document).ready(function() {
                 var text = "";
                 for (var i = 0; i < response.length; i++) {
                     var row = response[i];
-                    text += "<div class='col mb-3'><input type = 'hidden' name ='IdPJ[]' value ='" + row.IdPJ + "' > <div class = 'image-container' onmouseover = 'showOverlay(this)' onmouseout = 'hideOverlay(this)'> <img src = '../PJ/" + row.NomPJ + "' class = 'PJ' id = 'image" + i + "'> <div class = 'overlay-content d-none'> <input type ='file' name ='file[]' id = 'fileInput" + i + "' style = 'display:none' onchange = 'updateImage(\"image" + i + "\",\"fileInput" + i + "\",\"" + row.IdPJ + "\")' accept = 'image/*,application/pdf'> <label for='fileInput" + i + "'> <i class = 'fa fa-pen '> </i></label> </div> </div> <div class = 'caption '> <b class = 'ms-4' >Petit-déjeuner</b></div></div>";
+                    text += "<div class='col mb-3' style='margin-top: 28px'><input type = 'hidden' name ='IdPJ[]' value ='" + row.IdPJ + "' > <div class = 'image-container' onmouseover = 'showOverlay(this)' onmouseout = 'hideOverlay(this)'> <img src = '../PJ/" + row.NomPJ + "' class = 'PJ' id = 'image" + i + "'> <div class = 'overlay-content d-none'> <input type ='file' name ='file[]' id = 'fileInput" + i + "' style = 'display:none' onchange = 'updateImage(\"image" + i + "\",\"fileInput" + i + "\",\"" + row.IdPJ + "\")' accept = 'image/*,application/pdf'> <label for='fileInput" + i + "'> <i class = 'fa fa-pen '> </i></label> </div> </div> <div class = 'caption '> <b class = 'ms-4' >"+row.Frais+"</b></div></div>";
                 }
                 $("#rowMissPJ").html(text);
             },

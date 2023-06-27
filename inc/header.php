@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta name="viewport"content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="./inc/css/style.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css">
@@ -42,13 +41,11 @@
                 </li>
             </ul>
             <div class='d-flex dropdown'>
-              <button class='btn btn-secondary dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'  style='background-color: white !important;width: 161px;color: gray !important;border: none !important;height: 33px;'>
-                Bonjour admin
-              </button>
-              <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
-                <a class='dropdown-item' href='profil.php'>Profil</a>
-                <a class='dropdown-item' href='#'>Déconnexion</a>
-              </div>
+                <button class='btn btn-secondary dropdown-toggle' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'  style='background-color: white !important;width: 161px;color: gray !important;border: none !important;height: 33px;'>Bonjour admin</button>
+                <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
+                    <a class='dropdown-item' href='profil.php'>Profil</a>
+                    <a class='dropdown-item' href='#'>Déconnexion</a>
+                </div>
             </div>
         </div>
     </div>

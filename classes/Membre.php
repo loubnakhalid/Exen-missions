@@ -2,6 +2,7 @@
 namespace Tets\Oop;
 class Membre
 {
+
     private $id;
     private $Nom;
     private $Prénom;
@@ -23,7 +24,6 @@ class Membre
         $this->CIN = $CIN;
         $this->Profil = $Profil;
     }
-
     public function setMdps($Mdps){
         $this->Mdps=$Mdps;
     }
@@ -61,7 +61,6 @@ class Membre
             'Profil' => $this->Profil,
         ));
     } 
-    
     public function modifierCollaborateur(){
         $updateData = array(
             "Nom" => $this->Nom,
@@ -72,13 +71,12 @@ class Membre
             "CIN" => $this->CIN,
             "Profil" => $this->Profil,
         );
-        /*if (!empty($this->Mdps)) {
+        if (isset($this->Mdps) && $this->Mdps !== '') {
             $updateData['Mdps'] = $this->Mdps;
-        }*/
+        }
         $id=$this->id;
         return DataBase::updateData('membres', $updateData, "IdMb=$id");
     }
-
     public function modifierAdmin(){
         $id=$this->id;
         return DataBase::updateData('membres',array(
@@ -87,7 +85,6 @@ class Membre
             "Email" =>$this->Email,
         ),"IdMb=$id");
     }
-
     public static function delete($id){
         return DataBase::deleteData('membres', "IdMb='$id'");
     }
@@ -109,18 +106,30 @@ class Membre
             return null;
         }
     }
+    public function comparer(Membre $autreMembre) {
+        if ($this->id == $autreMembre->id &&
+            $this->Nom == $autreMembre->Nom &&
+            $this->Prénom == $autreMembre->Prénom &&
+            $this->TitreCivilité == $autreMembre->TitreCivilité &&
+            $this->Grp == $autreMembre->Grp &&
+            $this->Email == $autreMembre->Email &&
+            $this->CIN == $autreMembre->CIN &&
+            $this->Profil == $autreMembre->Profil) {
+            return true;
+        }
+        
+        return false;
+    }
+
     public static function vérifEmail($Email){
         return DataBase::getDataWhere('membres',"Email='$Email'");
     }
-
     public static function vérifEmailId($Email,$id){
         return DataBase::getDataWhere('membres',"Email='$Email' and IdMb != '$id'");
     }
-
     public static function vérifCIN($CIN){
         return DataBase::getDataWhere('membres',"CIN='$CIN'");
     }
-
     public static function vérifCINlId($CIN,$id){
         return DataBase::getDataWhere('membres',"CIN='$CIN' and IdMb != '$id'");
     }
@@ -131,7 +140,6 @@ class Membre
     public static function password_encrypt($password):string{
         return password_hash($password, PASSWORD_BCRYPT, ['cost' => 10]);
     }
-
     public static function password_decrypt($password,$hash):bool{
         if(password_verify($password,$hash)){
             return true;
@@ -140,14 +148,12 @@ class Membre
             return false;
         }
     }
-
     public static function getLastId(){
         $con=DataBase::connect();
         $query=$con->query("select * from membres where Statut=0 order by IdMb desc limit 1");
         $row=$query->fetch();
         return $row['IdMb'];
     }
-
     public static function Connect():bool{
         if (isset($_SESSION['membre'])) {
             return true;
@@ -155,7 +161,6 @@ class Membre
             return false;
         }
     }
-
     public static function Admin():bool{
         if (self::Connect() && ($_SESSION['membre']['Statut'] == 1)) {
             return true;
@@ -163,7 +168,6 @@ class Membre
             return false;
         }
     }
-
     public static function Collab():bool{
         if (self::Connect() && ($_SESSION['membre']['Statut'] == 0)) {
             return true;
@@ -173,11 +177,11 @@ class Membre
     }
     public static function countMissions($IdMb){
         $con=DataBase::connect();
-        $query=$con->query("select * from missions where IdMb='$IdMb' and deletedAt is NULL");
+        $query=$con->query("select * from missions where IdMb='$IdMb' and deletedAt is NULL and StatutMiss='1'");
         return $query->rowCount();
     }
     public static function countTotalRemb($IdMb){
-        $row=DataBase::getDataWhere('missions',"IdMb=$IdMb and Montant is not null and deletedAt is null");
+        $row=DataBase::getDataWhere('missions',"IdMb=$IdMb and Montant is not null and deletedAt is null and StatutMiss='1'");
         $remb=0;
         foreach($row as $row){
             $remb+=$row['Montant'];
