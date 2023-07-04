@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : mar. 04 juil. 2023 à 17:00
+-- Généré le : mar. 04 juil. 2023 à 17:05
 -- Version du serveur : 10.4.27-MariaDB
 -- Version de PHP : 8.2.0
 
@@ -74,6 +74,18 @@ CREATE TABLE `historique` (
   `ElementAction` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Déchargement des données de la table `historique`
+--
+
+INSERT INTO `historique` (`IdAction`, `TypeAction`, `DateAction`, `ElementAction`) VALUES
+(1, 'Déconnexion', '04/07/2023 16:01:57', ''),
+(2, 'Modification', '04/07/2023 16:04:08', 'Collaborateur 1'),
+(3, 'Connexion', '04/07/2023 16:04:17', ''),
+(4, 'Déconnexion', '04/07/2023 16:04:35', ''),
+(5, 'Connexion', '04/07/2023 16:04:37', ''),
+(6, 'Déconnexion', '04/07/2023 16:05:16', '');
+
 -- --------------------------------------------------------
 
 --
@@ -98,7 +110,7 @@ CREATE TABLE `membres` (
 --
 
 INSERT INTO `membres` (`IdMb`, `IdG`, `Statut`, `Nom`, `Prénom`, `TitreCivilité`, `Email`, `Mdps`, `CIN`, `Profil`) VALUES
-(1, 1, 1, 'admin', 'admin', 'M.', 'admin@gmail.com', '$2y$14$dMTSdQzy.0kO3xFO1Dv25OEBn6LTyJaij9roEYEDYWpCricIo86.W', 'F678337', 'admin');
+(1, 1, 1, 'admin', 'admin', 'M.', 'admin@gmail.com', '$2y$10$oNrByf6sfExyJz4mhkEad.xKgetHEhO..Jqfhc8Yrkgw78ZfDvQUK', 'F678337', 'admin');
 
 -- --------------------------------------------------------
 
@@ -233,7 +245,7 @@ ALTER TABLE `groupes`
 -- AUTO_INCREMENT pour la table `historique`
 --
 ALTER TABLE `historique`
-  MODIFY `IdAction` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `IdAction` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT pour la table `membres`
