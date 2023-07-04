@@ -150,7 +150,7 @@
                 $historique=new Historique("Suppression",date("d/m/20y H:i:s"),"Collaborateur $IdCollab");
                 if($historique->insertHistorique()){
                     $_SESSION['success'] = "Collaborateur supprimé avec succès !";
-                    header("Location: ./admin/groupes.php?page=$page");
+                    header("Location: ./admin/collabs.php?page=$page");
                 }
             }
             else{
@@ -485,6 +485,12 @@
         $DateFormat=explode("-",$Départ);
         $mois=mois($DateFormat[1]);
         $année=$DateFormat[2];
+        if($Civilité=="M."){
+            $sous="Je soussigné";
+        }
+        else{
+            $sous="Je soussignée";
+        }
         $Remb += $Remb *($groupe->getTaux()/100);
         if(Mission::validerRemb($IdMiss,$Remb,$_POST['Paiement'])){
             $mission=Mission::getMissById($IdMiss);
@@ -544,7 +550,7 @@
             $pdf->SetFont('Helvetica','',12);
             $pdf->Ln('30');
             $pdf->SetX('10');
-            $pdf->MultiCell(190,9,iconv("UTF-8", "CP1252//TRANSLIT", "Je soussiné $Civilité $nom $prenom titulaire de la CIN n° $CIN reconnais avoir reçu de la société exen consulting sarl la somme de $Remb DH ".ucfirst($lettre->Conversion($Remb))."Dirhams par $paiement au titre des remboursements de frais de mon deplacement à $LieuDép durant le mois de $mois $année"),0,'J');
+            $pdf->MultiCell(190,9,iconv("UTF-8", "CP1252//TRANSLIT", "$sous $Civilité $nom $prenom titulaire de la CIN n° $CIN reconnais avoir reçu de la société exen consulting sarl la somme de $Remb DH ".ucfirst($lettre->Conversion($Remb))."Dirhams par $paiement au titre des remboursements de frais de mon deplacement à $LieuDép durant le mois de $mois $année"),0,'J');
             $pdf->Output('F',"PDF/Demande_Remboursement/Demande_Remboursement_$IdMiss.pdf",true);
         }
         header("location:./admin/missions.php");
@@ -846,7 +852,7 @@
     /*Vérification de l'Email et CIN pour le formulaire de modification*/
     elseif(isset($_POST['vérifEmailCinModif'])){
         $response = array();
-        if (Membre::vérifCINlId($_POST['CIN'], $_POST['IdMb'])) {
+        if (Membre::vérifCINId($_POST['CIN'], $_POST['IdMb'])) {
             $response['erreurCIN'] = "CIN déjà existant";
         }
         if (Membre::vérifEmailId($_POST['Email'], $_POST['IdMb'])) {

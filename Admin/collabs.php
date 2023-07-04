@@ -105,7 +105,7 @@
             </div>
             <div>
                 <ul class="pagination">
-                    <li class="page-item <?php if($page==1)echo 'disabled'; ?>">
+                    <li class="page-item <?php if($page==1) echo 'disabled'; ?>">
                         <a class="page-link" href="?page=<?php echo $page-1; ?>">&laquo;</a>
                     </li>
                     <?php
@@ -158,7 +158,6 @@
                         <div class="col-xl col-lg">
                             <label for="" class="form-label">Groupe :</label>
                             <select name="Grp" id="GrpAjt" class="form-select">
-                                <option value="">Aucun</option>
                             <?php
                                 $row=DataBase::getData('groupes');
                                 foreach($row as $row){

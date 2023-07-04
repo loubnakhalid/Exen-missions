@@ -3,10 +3,10 @@
     use \Tets\Oop\DataBase;
     $con=DataBase::connect();
     if(isset($_GET['search'])){
-        $count=$con->query("select count(IdG) as cpt from groupes where (IdG like '%$_GET[search]%' or Libellé like '%$_GET[search]%' or TauxG like '%$_GET[search]%') ");
+        $count=$con->query("select count(IdG) as cpt from groupes where Libellé <> 'Aucun' and (IdG like '%$_GET[search]%' or Libellé like '%$_GET[search]%' or TauxG like '%$_GET[search]%') ");
     }
     else{
-        $count=$con->query("select count(IdG) as cpt from groupes");
+        $count=$con->query("select count(IdG) as cpt from groupes where Libellé <> 'Aucun'");
     }
     $tcount=$count->fetchAll();
     $nbr_elements_par_page=6;
@@ -24,11 +24,11 @@
     $debut=($page-1)*$nbr_elements_par_page;
     //les enregistrements
     if(isset($_GET['search'])){
-        $rslt=$con->query("select * from groupes where (IdG like '%$_GET[search]%' or Libellé like '%$_GET[search]%' or TauxG like '%$_GET[search]%') order by IdG limit $debut,$nbr_elements_par_page");
+        $rslt=$con->query("select * from groupes where Libellé <> 'Aucun' and (IdG like '%$_GET[search]%' or Libellé like '%$_GET[search]%' or TauxG like '%$_GET[search]%') order by IdG limit $debut,$nbr_elements_par_page");
 
     }
     else{
-        $rslt=$con->query("select * from groupes order by IdG limit $debut,$nbr_elements_par_page");
+        $rslt=$con->query("select * from groupes where Libellé <> 'Aucun' order by IdG limit $debut,$nbr_elements_par_page");
     }
     $row=$rslt->fetchAll();
 ?>

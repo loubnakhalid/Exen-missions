@@ -136,8 +136,8 @@ function vérifAjtCollab() {
             success: function(response) {
                 if (response.hasOwnProperty('erreurCIN')) {
                     CIN.classList.add('is-invalid');
-                    errPasswordActuelle.style.display = 'block';
-                    errPasswordActuelle.innerHTML = response.erreurCIN;
+                    document.getElementById('errCINAjt').style.display = 'block';
+                    document.getElementById('errCINAjt').innerHTML = response.erreurCIN;
                     aide = false;
                 }
                 if (response.hasOwnProperty('erreurEmail')) {

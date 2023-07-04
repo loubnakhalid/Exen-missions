@@ -49,17 +49,31 @@ class Membre
         return $this->Profil;
     }
     public function ajouterCollaborateur(){
-        return DataBase::insertData('membres',array(
-            'IdG' => $this->Grp,
-            'Statut' => 0,
-            'Nom' => $this->Nom,
-            'PréNom' => $this->Prénom,
-            'TitreCivilité' => $this->TitreCivilité,
-            'Email' => $this->Email,
-            'Mdps' => $this->Mdps,
-            'CIN' => $this->CIN,
-            'Profil' => $this->Profil,
-        ));
+        if(!empty($this->Grp)){
+            return DataBase::insertData('membres',array(
+                'IdG' => $this->Grp,
+                'Statut' => 0,
+                'Nom' => $this->Nom,
+                'PréNom' => $this->Prénom,
+                'TitreCivilité' => $this->TitreCivilité,
+                'Email' => $this->Email,
+                'Mdps' => $this->Mdps,
+                'CIN' => $this->CIN,
+                'Profil' => $this->Profil,
+            ));
+        }
+        else{
+            return DataBase::insertData('membres',array(
+                'Statut' => 0,
+                'Nom' => $this->Nom,
+                'PréNom' => $this->Prénom,
+                'TitreCivilité' => $this->TitreCivilité,
+                'Email' => $this->Email,
+                'Mdps' => $this->Mdps,
+                'CIN' => $this->CIN,
+                'Profil' => $this->Profil,
+            ));
+        }
     } 
     public function modifierCollaborateur(){
         $updateData = array(
@@ -130,7 +144,7 @@ class Membre
     public static function vérifCIN($CIN){
         return DataBase::getDataWhere('membres',"CIN='$CIN'");
     }
-    public static function vérifCINlId($CIN,$id){
+    public static function vérifCINId($CIN,$id){
         return DataBase::getDataWhere('membres',"CIN='$CIN' and IdMb != '$id'");
     }
     public static function vérifMdps($IdMb,$Mdps){
